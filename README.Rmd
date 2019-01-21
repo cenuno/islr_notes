@@ -4,6 +4,7 @@ author: "Cristian E. Nuno"
 date: "`r format( x = Sys.Date(), format = '%B %d, %Y')`"
 output: github_document
 ---
+<base target="_top"/>
 
 [An Introduction to Statistical Learning with Applications in R](http://www-bcf.usc.edu/~gareth/ISL/) is written by [Gareth James](http://www-bcf.usc.edu/~gareth/bio.html), [Daniela Witten](https://en.wikipedia.org/wiki/Daniela_Witten), [Trevor Hastie](https://en.wikipedia.org/wiki/Trevor_Hastie), and [Robert Tibshirani](https://en.wikipedia.org/wiki/Robert_Tibshirani).
 

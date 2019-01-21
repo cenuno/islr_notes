@@ -352,6 +352,26 @@ For instance, the `Wage` data set contains `r ncol(Wage)` variables for `r nrow(
 
 Note that any `data set`, `column name`, or `file` will be distinguished by a gray-colored background.
 
+## Organization of This Book
 
+* Chapter 2 introduces the basic terminology and concepts behind statistical learning. 
+    + This chapter also presents the K-nearest neighbor classifier, a very simple method that works surprisingly well on many problems.
 
+* Chapter 3 reviews linear regression, the fundamental starting point for all regression methods. 
 
+* Chapter 4 discusses two of the most important classical classification methods, logistic regression and linear discriminant analysis.
+
+* Chapter 5 introduces cross-validation and the bootstrap, which can be used to estimate the accuracy of a number of different methods in order to choose the best one.
+
+* Chapter 6 considers a host of linear methods, both classical and more modern, which offer potential improvements over standard linear regression.
+    + These include stepwise selection, ridge regression, principal components regression, partial least squares, and the lasso.
+    
+* Chapter 7 introduces a number of non-linear methods that work well for problems with a single input variable.
+    + Show how these methods can be used to fit non-linear additive models for which there is more than one input.
+    
+* Chapter 8 investigates tree-based methods, including bagging, boosting, and random forests.
+
+* Chapter 9 introduces support vector machines, a set of approaches for performing both linear and non-linear classification.
+
+* Chapter 10 considers a setting in which we have input variables but no output variable. 
+    + In particular, we present principal components analysis, K-means clustering, and hierarchical clustering

@@ -7,6 +7,10 @@ January 21, 2019
     -   [Wage Data](#wage-data)
     -   [Stock Market Data](#stock-market-data)
     -   [Gene Expression Data](#gene-expression-data)
+    -   [A Brief History of Statistical Learning](#a-brief-history-of-statistical-learning)
+    -   [This Book](#this-book)
+    -   [Who Should Read This Book](#who-should-read-this-book)
+    -   [Notation and Simple Matrix Algebra](#notation-and-simple-matrix-algebra)
 
 ``` r
 # load necessary packages ----
@@ -344,3 +348,56 @@ NCI60$pca.data$x %>%
 ```
 
 ![](README_files/figure-markdown_github/gene%20expression-2.png)
+
+There is clear evidence that cell lines with the same cancer type tend to be located near each other in this two-dimensional representation. In addition, even though the cancer infor- mation was not used to produce the left-hand panel, the clustering obtained does bear some resemblance to some of the actual cancer types observed in the right-hand panel.
+
+A Brief History of Statistical Learning
+---------------------------------------
+
+At the beginning of the nineteenth century, [Legendre and Gauss published papers on the method of least squares](http://econ.ucsb.edu/~doug/240a/The%20Discovery%20of%20Statistical%20Regression.htm), which implemented the earliest form of what is now known as linear regression. Linear regression is used for predicting [quantitative values](https://en.wikipedia.org/wiki/Quantitative), such as an individual’s salary.
+
+In order to predict [qualitative values](https://en.wikipedia.org/wiki/Qualitative), such as whether a patient survives or dies, or whether the stock market increases or decreases, [Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher) proposed [linear discriminant analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis) in 1936.
+
+In the 1940s, various authors put forth an alternative approach, [logistic regression](https://en.wikipedia.org/wiki/Logistic_regression). In the early 1970s, [Nelder](https://en.wikipedia.org/wiki/John_Nelder) and [Wedderburn](https://en.wikipedia.org/wiki/Robert_Wedderburn_(statistician)) coined the term [generalized linear models](https://en.wikipedia.org/wiki/Generalized_linear_model) for an entire class of statistical learning methods that include both linear and logistic regression as special cases.
+
+By the 1980s, [computing technology had finally improved sufficiently](https://gizmodo.com/the-trillion-fold-increase-in-computing-power-visualiz-1706676799) that non-linear methods were no longer computationally prohibitive.
+
+In mid 1980s [Breiman](https://en.wikipedia.org/wiki/Leo_Breiman), [Friedman](https://en.wikipedia.org/wiki/Jerome_H._Friedman), [Olshen](http://statweb.stanford.edu/~olshen/) and [Stone](https://statistics.berkeley.edu/people/chuck-stone) introduced [classification and regression trees](https://rafalab.github.io/pages/649/section-11.pdf), and were among the first to demonstrate the power of a detailed practical implementation of a method, including [cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)) for [model selection](https://en.wikipedia.org/wiki/Model_selection).
+
+[Hastie](https://en.wikipedia.org/wiki/Trevor_Hastie) and [Tibshirani](https://en.wikipedia.org/wiki/Robert_Tibshirani) coined the term [generalized additive models](https://en.wikipedia.org/wiki/Generalized_additive_model) in 1986 for a class of non-linear extensions to generalized linear models, and also provided a practical software implementation.
+
+This Book
+---------
+
+[The Elements of Statistical Learning (ESL)](https://web.stanford.edu/~hastie/Papers/ESLII.pdf) by Hastie, Tibshirani, and Friedman was first published in 2001. Since that time, it has become an important reference on the fundamentals of statistical machine learning.
+
+Over time, there has been growing recognition across a number of fields, from business to health care to genetics to the social sciences and beyond, that statistical learning is a powerful tool with important practical applications. As a result, **the field has moved from one of primarily academic interest to a mainstream discipline**, with an enormous potential audience.
+
+The purpose of An Introduction to Statistical Learning (ISL) is to facilitate the transition of statistical learning from an academic to a mainstream field.
+
+ISL is built on four premises:
+
+1.  Many statistical learning methods are relevant and useful in a wide range of academic and non-academic disciplines, beyond just the statistical sciences.
+    -   Focus on most widely used methods
+2.  Statistical learning should not be viewed as a series of black boxes.
+    -   Attempted to carefully describe the model, intuition, assumptions, and trade-offs behind each of the methods that we consider.
+3.  While it is important to know what job is performed by each cog, it is not necessary to have the skills to construct the machine inside the box!
+    -   Assumed that the reader is comfortable with basic mathematical concepts, but does not possess a graduate degree in the mathematical sciences.
+4.  Presume that the reader is interested in applying statistical learning methods to real-world problems.
+    -   [`R`](https://www.r-project.org/about.html) is the language of choice for academic statisticians, and new approaches often become available in `R` years before they are implemented in commercial packages.
+
+Who Should Read This Book
+-------------------------
+
+This book is **intended for anyone who is interested in using modern statistical methods for modeling and prediction from data**.
+
+This group includes scientists, engineers, data analysts, or quants, but also less technical individuals with degrees in non-quantitative fields such as the social sciences or business. We expect that the reader will have had at least one elementary course in statistics.
+
+Notation and Simple Matrix Algebra
+----------------------------------
+
+We will use *n* to represent the number of distinct data points, or observa- tions, in our sample. We will let *p* denote the number of variables that are available for use in making predictions.
+
+For instance, the `Wage` data set contains 11 variables for 3000 people. Therefore, we have *n* = 3000 observations and *p* = 11 variables.
+
+Note that any `data set`, `column name`, or `file` will be distinguished by a gray-colored background.

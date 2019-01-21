@@ -13,6 +13,7 @@ output:
 # load necessary packages ----
 library(gridExtra)  # misc. functions for 'grid' graphics
 library(ISLR)       # data for ISLR examples
+library(MASS)       # Venables & Ripley's 'Modern Applied Statistics with s'
 library(scales)     # scale functions for visualizations
 library(tidyverse)  # data science packages
 
@@ -82,7 +83,15 @@ Wage %>%
 
 ## Stock Market Data
 
-When we wish to predict a non-numerical value - a **categorical** or **qualitative** output, this is known as a **classification** problem. Let's examine the [`Smarket`](https://www.rdocumentation.org/packages/ISLR/versions/1.2/topics/Smarket) data set.
+When we wish to predict a non-numerical value - a **categorical** or **qualitative** output, this is known as a **classification** problem.
+
+Let's examine the [`Smarket`](https://www.rdocumentation.org/packages/ISLR/versions/1.2/topics/Smarket) data set, that contains the daily movements in the [Standard & Poor’s 500 (S&P)](https://www.standardandpoors.com/en_US/web/guest/home) stock index over a 5-year period between 2001 and 2005.
+
+The goal is to predict whether the index will *increase* or *decrease* on a given day using the past 5 days’ percentage changes in the index. Here the statistical learning problem does not involve predicting a numerical value. 
+
+Instead it involves predicting whether a given day’s stock market performance will fall into the `Up` bucket or the `Down` bucket. This is known as a **classification** problem. 
+
+The three plots below look almost identical, suggesting that there is no simple strategy for using yesterday’s movement in the S&P to predict today’s returns.
 
 ```{r stock plots}
 # produce a boxplot per lag ----
@@ -99,6 +108,7 @@ LagPlot <- function(col) {
     geom_boxplot(show.legend = FALSE) +
     scale_fill_manual(values = c("#fd3504", "#04ccfd")) +
     ylab("Percentage change in S&P") +
+    xlab("Today's direction") +
     labs(caption = caption) +
     my.theme +
     theme(plot.title = element_text(hjust = 0.5))
@@ -116,3 +126,63 @@ stock.plots <-
 grid.arrange(stock.plots$Lag1, stock.plots$Lag2, stock.plots$Lag3, ncol = 3)
 ```
 
+Now let's fit a [quadratic discriminant analysis model](http://uc-r.github.io/discriminant_analysis) to the subset of the `Smarket` data corresponding to the 2001–2004 time period, and predicted the probability of a stock market decrease using the 2005 data.
+
+
+```{r stock qda}
+# split data into training and testing sets ----
+train <- Smarket %>% filter(Year %in% 2001:2004 )
+
+test <- Smarket %>% filter(Year == 2005)
+
+# fit a quadratic discriminatory analysis model ----
+qda.fit <- qda(Direction ~ Lag1 + Lag2, data = train)
+
+# display model 
+qda.fit
+
+# predict() is used to predict the % of market direction given value of the predictors
+qda.predict <- predict(qda.fit, test)
+
+# cross-reference the predicted Direction values with the actual values ----
+#
+# note: of the 50 predicted values of Down, only 30 were correctly identified
+#
+# note: of the 202 predicted values of Up, only 121 were correctly identified
+#
+table(qda.predict$class, test$Direction)
+
+
+# True positive rate ----
+# i.e. of all the predicted values, how many were actually correct
+#
+# sum(30, 121) / nrow(test)
+mean(qda.predict$class == test$Direction)
+
+# visualize predicted probabilities by Direction ----
+qda.predict$posterior %>%
+  # transfrom matrix to tibble
+  as_tibble() %>%
+  # transfrom tibble from wide to long
+  gather(key = "direction", value = "pred_prop") %>%
+  ggplot(aes(x = direction, y = pred_prop, fill = direction)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_fill_manual(values = c("#fd3504", "#04ccfd")) +
+  scale_y_continuous(labels = percent) +
+  xlab("Today's direction") +
+  ylab("Posterior probabilities") +
+  labs(title = "Posterior probability that the corresponding observations\nwill or will not classify the correct stock market direction"
+       , caption = stock.text) +
+  my.theme
+
+```
+
+## Gene Expression Data
+
+The previous two applications illustrate data sets with both input and output variables.
+
+There are situations in which we *only observe input variables, with no corresponding output*.
+
+* Ex: market setting uses demographic data to understand which types of current customers are similar to one another by **grouping individuals according to their observed characteristics**. This is known as a *clustering* problem.
+
+Let's examine the [`NCI60`](https://www.rdocumentation.org/packages/ISLR/versions/1.2/topics/NCI60) data set and how to visualize it using [principal component analysis](https://uc-r.github.io/pca).

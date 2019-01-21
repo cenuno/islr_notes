@@ -1,0 +1,80 @@
+Introduction
+================
+Cristian E. Nuno
+January 20, 2019
+
+``` r
+# load necessary packages ----
+library(ISLR)       # data for ISLR examples
+library(scales)     # scale functions for visualizations
+library(tidyverse)  # data science packages
+
+# load necessary objects ----
+caption.text <- "Source: ISLR, 2017"
+my.theme <- theme_minimal() + theme(panel.grid = element_blank())
+
+# set dpi for all chunks ----
+knitr::opts_chunk$set(dpi = 300)
+```
+
+Introduction
+============
+
+-   Statistical learning = understanding data
+    -   Supervised: Building a statistical model for predicting, or estimating, an output based on one or more inputs
+    -   Unsupervised: There are inputs but no supervising output
+
+Wage Data
+---------
+
+In particular, we wish to understand the association between an employee’s age and education, as well as the calendar year, on his wage.
+
+The [`Wage`](https://rdrr.io/cran/ISLR/man/Wage.html) data set involves predicting a **continuous** or **quantitative** output value, which is referred to as a **regression** problem.
+
+``` r
+# hourly wage described by age ----
+Wage %>%
+  ggplot(aes(x = age, y = wage)) +
+  geom_point(color = "gray") +
+  geom_smooth(se = FALSE, color = "navy") +
+  xlab("Age") +
+  ylab("Hourly wage") +
+  scale_y_continuous(labels = dollar) +
+  labs(title = "Whiles wages typically rise with age, they fall after age 60"
+       , caption = caption.text) +
+  my.theme
+```
+
+![](README_files/figure-markdown_github/wage%20plots-1.png)
+
+``` r
+# hourly wage described by year ----
+Wage %>%
+  ggplot(aes(x = year, y = wage)) +
+  geom_point(color = "gray") +
+  geom_smooth(se = FALSE, method = "loess", color = "navy") +
+  xlab("Year") +
+  ylab("Hourly wage") +
+  scale_y_continuous(labels = dollar) +
+  labs(title = "On average, hourly wage rises slighly over time"
+       , caption = caption.text) +
+  my.theme
+```
+
+![](README_files/figure-markdown_github/wage%20plots-2.png)
+
+``` r
+# hourly wage described by education ----
+Wage %>%
+  ggplot(aes(x = education, y = wage, fill = education)) +
+  geom_boxplot() +
+  scale_fill_brewer(name = "Education level", type = "qual", palette = "Accent") +
+  xlab("Education level") +
+  ylab("Hourly wage") +
+  scale_y_continuous(labels = dollar) +
+  labs(title = "On average, hourly wage rises with higher levels of educational attainment"
+       , caption = caption.text) +
+  my.theme
+```
+
+![](README_files/figure-markdown_github/wage%20plots-3.png)

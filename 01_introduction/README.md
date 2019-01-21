@@ -6,6 +6,7 @@ January 21, 2019
 -   [Introduction](#introduction)
     -   [Wage Data](#wage-data)
     -   [Stock Market Data](#stock-market-data)
+    -   [Gene Expression Data](#gene-expression-data)
 
 ``` r
 # load necessary packages ----
@@ -19,6 +20,8 @@ library(tidyverse)  # data science packages
 wage.text <- "Source: Wage and other data for a group of 3000 male workers in the Mid-Atlantic region"
 
 stock.text <- "Source: Daily percentage returns for the S&P 500 stock index between 2001 and 2005"
+
+gene.text <- "Source: NCI microarray data that contains cancer type and expression levels on 6,830 genes from 64 cancer cell lines"
 
 my.theme <- 
   theme_minimal() + 
@@ -213,3 +216,131 @@ qda.predict$posterior %>%
 ```
 
 ![](README_files/figure-markdown_github/stock%20qda-1.png)
+
+Gene Expression Data
+--------------------
+
+The previous two applications illustrate data sets with both input and output variables.
+
+There are situations in which we *only observe input variables, with no corresponding output*.
+
+-   Ex: market setting uses demographic data to understand which types of current customers are similar to one another by **grouping individuals according to their observed characteristics**. This is known as a *clustering* problem.
+
+Let's examine the [`NCI60`](https://www.rdocumentation.org/packages/ISLR/versions/1.2/topics/NCI60) data set and how to visualize it using [principal component analysis](https://uc-r.github.io/pca).
+
+``` r
+# apply PCA ----
+# note: standardize values by centering and scaling
+NCI60$pca.data <- 
+  prcomp(NCI60$data
+         , center = TRUE
+         , scale. = TRUE)
+
+# create color schema for 4 types of clusters ---
+cluster.color.schema <-
+  map2_chr(.x = NCI60$pca.data$x[, "PC1"]
+           , .y = NCI60$pca.data$x[, "PC2"]
+           , .f = ~
+             if (.x < -40 & .y > -20) {
+               "red"
+             } else if (.x < 0 & .y < -20) {
+               "#0077cc"
+             } else if (.x > -40 & .y < 40 & .x < 50) {
+               "royalblue4"
+             } else if (.x > 25 & .y < 5) {
+               "green3"
+             })
+
+# visualize cluster plot ----
+NCI60$pca.data$x %>%
+  as_tibble() %>%
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_point(color = cluster.color.schema) +
+  my.theme +
+  labs(title = "PCA makes it possible to visualize the 64 cancer cell lines and their\n6,830 measurements in a 2-dimensional space"
+       , caption = gene.text)
+```
+
+![](README_files/figure-markdown_github/gene%20expression-1.png)
+
+``` r
+# store color schema as seen in fig 1.4 on page 5 ----
+# note: overwriting the cancer.type.color.schema object
+cancer.type.color.schema <-
+  map_chr(.x = NCI60$labs %>% set_names()
+          , .f = ~
+            if (.x == "CNS"){
+              "orange"
+            } else if (.x == "RENAL"){
+              "purple"
+            } else if (.x == "BREAST"){
+              "red"
+            } else if (.x == "NSCLC"){
+              "royalblue4"
+            } else if (.x == "UNKNOWN"){
+              "red"
+            } else if (.x == "OVARIAN"){
+              "royalblue4"
+            } else if (.x == "MELANOMA"){
+              "#0077cc"
+            } else if (.x == "PROSTATE"){
+              "purple"
+            } else if (.x == "LEUKEMIA"){
+              "green3"
+            } else if (.x == "K562B-repro"){
+              "green3"
+            } else if (.x == "K562A-repro"){
+              "palegreen"
+            } else if (.x == "COLON"){
+              "yellow"
+            } else if (.x == "MCF7A-repro"){
+              "darkseagreen3"
+            } else if (.x == "MCF7D-repro"){
+              "darkseagreen2"
+            })
+
+cancer.type.shape <-
+  map_dbl(.x = NCI60$labs %>% set_names()
+         , .f = ~
+           if (.x == "CNS"){
+             17
+           } else if (.x == "RENAL"){
+             19
+           }else if (.x == "BREAST"){
+             19
+           } else if (.x == "NSCLC"){
+             17
+           } else if (.x == "UNKNOWN"){
+             17
+           } else if (.x == "OVARIAN"){
+             18
+           } else if (.x == "MELANOMA"){
+             19
+           } else if (.x == "PROSTATE"){
+             15
+           } else if (.x == "LEUKEMIA"){
+             17
+           } else if (.x == "K562B-repro"){
+             19
+           } else if (.x == "K562A-repro"){
+             15
+           } else if (.x == "COLON"){
+             18
+           } else if (.x == "MCF7A-repro"){
+             18
+           } else if (.x == "MCF7D-repro"){
+             15
+           })
+
+# visualize data space by cancer type ----
+NCI60$pca.data$x %>%
+  as_tibble() %>%
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_point(color = cancer.type.color.schema
+             , shape = cancer.type.shape) +
+  my.theme +
+  labs(title = "Now each color and shape represents one of the 14 different types of cancer"
+       , caption = gene.text)
+```
+
+![](README_files/figure-markdown_github/gene%20expression-2.png)

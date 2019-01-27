@@ -72,8 +72,6 @@ df.tidy %>%
 
 ![](README_files/figure-markdown_github/examine%20advertising-1.png)
 
-In the formula *Y* = *f*(*x*)+*ϵ*, *f* represents the *systematic* information that *X* provides about *Y*. *ϵ* is a random *error term* that is both independent from *X* and has a mean of zero.
-
 Another example of visualizing the relationship between *X* and *Y* uses `income` and `years of education` from the [`Income1`](https://github.com/cenuno/islr_notes/blob/master/00_raw_data/income1.csv) data set.
 
 ``` r
@@ -114,6 +112,10 @@ grid.arrange(base.plot +
 ```
 
 ![](README_files/figure-markdown_github/income%20and%20education-1.png)
+
+In the formula *Y* = *f*(*x*)+*ϵ*, *f* represents the *systematic* information that *X* provides about *Y*. *ϵ* is a random *error term* that is both independent from *X* and has a mean of zero.
+
+**In essence, statistical learning refers to a set of approaches for estimating *f***. In this chapter we outline some of the key theoretical concepts that arise in estimating *f*, as well as tools for evaluating the estimates obtained.
 
 Session Info
 ------------

@@ -1,7 +1,7 @@
 Introduction
 ================
 Cristian E. Nuno
-January 21, 2019
+January 27, 2019
 
 -   [Introduction](#introduction)
     -   [Wage Data](#wage-data)
@@ -12,6 +12,7 @@ January 21, 2019
     -   [Who Should Read This Book](#who-should-read-this-book)
     -   [Notation and Simple Matrix Algebra](#notation-and-simple-matrix-algebra)
     -   [Organization of This Book](#organization-of-this-book)
+    -   [Session Info](#session-info)
 
 ``` r
 # load necessary packages ----
@@ -424,3 +425,88 @@ Organization of This Book
 
 -   Chapter 10 considers a setting in which we have input variables but no output variable.
     -   In particular, we present principal components analysis, K-means clustering, and hierarchical clustering
+
+Session Info
+------------
+
+``` r
+sessioninfo::session_info()
+```
+
+    ## ─ Session info ──────────────────────────────────────────────────────────
+    ##  setting  value                       
+    ##  version  R version 3.5.2 (2018-12-20)
+    ##  os       macOS High Sierra 10.13.6   
+    ##  system   x86_64, darwin15.6.0        
+    ##  ui       X11                         
+    ##  language (EN)                        
+    ##  collate  en_US.UTF-8                 
+    ##  ctype    en_US.UTF-8                 
+    ##  tz       America/Chicago             
+    ##  date     2019-01-27                  
+    ## 
+    ## ─ Packages ──────────────────────────────────────────────────────────────
+    ##  package      * version  date       lib source        
+    ##  assertthat     0.2.0    2017-04-11 [1] CRAN (R 3.5.0)
+    ##  backports      1.1.3    2018-12-14 [1] CRAN (R 3.5.0)
+    ##  bindr          0.1.1    2018-03-13 [1] CRAN (R 3.5.0)
+    ##  bindrcpp     * 0.2.2    2018-03-29 [1] CRAN (R 3.5.0)
+    ##  broom          0.5.1    2018-12-05 [1] CRAN (R 3.5.0)
+    ##  cellranger     1.1.0    2016-07-27 [1] CRAN (R 3.5.0)
+    ##  cli            1.0.1    2018-09-25 [1] CRAN (R 3.5.0)
+    ##  colorspace     1.3-2    2016-12-14 [1] CRAN (R 3.5.0)
+    ##  crayon         1.3.4    2017-09-16 [1] CRAN (R 3.5.1)
+    ##  digest         0.6.18   2018-10-10 [1] CRAN (R 3.5.0)
+    ##  dplyr        * 0.7.8    2018-11-10 [1] CRAN (R 3.5.0)
+    ##  evaluate       0.12     2018-10-09 [1] CRAN (R 3.5.0)
+    ##  forcats      * 0.3.0    2018-02-19 [1] CRAN (R 3.5.0)
+    ##  generics       0.0.2    2018-11-29 [1] CRAN (R 3.5.0)
+    ##  ggplot2      * 3.1.0    2018-10-25 [1] CRAN (R 3.5.0)
+    ##  glue           1.3.0    2018-07-17 [1] CRAN (R 3.5.0)
+    ##  gridExtra    * 2.3      2017-09-09 [1] CRAN (R 3.5.0)
+    ##  gtable         0.2.0    2016-02-26 [1] CRAN (R 3.5.0)
+    ##  haven          2.0.0    2018-11-22 [1] CRAN (R 3.5.0)
+    ##  hms            0.4.2    2018-03-10 [1] CRAN (R 3.5.0)
+    ##  htmltools      0.3.6    2017-04-28 [1] CRAN (R 3.5.0)
+    ##  httr           1.4.0    2018-12-11 [1] CRAN (R 3.5.0)
+    ##  ISLR         * 1.2      2017-10-20 [1] CRAN (R 3.5.0)
+    ##  jsonlite       1.6      2018-12-07 [1] CRAN (R 3.5.0)
+    ##  knitr          1.21     2018-12-10 [1] CRAN (R 3.5.2)
+    ##  labeling       0.3      2014-08-23 [1] CRAN (R 3.5.0)
+    ##  lattice        0.20-38  2018-11-04 [1] CRAN (R 3.5.2)
+    ##  lazyeval       0.2.1    2017-10-29 [1] CRAN (R 3.5.0)
+    ##  lubridate      1.7.4    2018-04-11 [1] CRAN (R 3.5.0)
+    ##  magrittr       1.5      2014-11-22 [1] CRAN (R 3.5.0)
+    ##  MASS         * 7.3-51.1 2018-11-01 [1] CRAN (R 3.5.2)
+    ##  Matrix         1.2-15   2018-11-01 [1] CRAN (R 3.5.2)
+    ##  mgcv           1.8-26   2018-11-21 [1] CRAN (R 3.5.2)
+    ##  modelr         0.1.2    2018-05-11 [1] CRAN (R 3.5.0)
+    ##  munsell        0.5.0    2018-06-12 [1] CRAN (R 3.5.0)
+    ##  nlme           3.1-137  2018-04-07 [1] CRAN (R 3.5.2)
+    ##  pillar         1.3.1    2018-12-15 [1] CRAN (R 3.5.0)
+    ##  pkgconfig      2.0.2    2018-08-16 [1] CRAN (R 3.5.0)
+    ##  plyr           1.8.4    2016-06-08 [1] CRAN (R 3.5.0)
+    ##  purrr        * 0.2.5    2018-05-29 [1] CRAN (R 3.5.0)
+    ##  R6             2.3.0    2018-10-04 [1] CRAN (R 3.5.0)
+    ##  RColorBrewer   1.1-2    2014-12-07 [1] CRAN (R 3.5.0)
+    ##  Rcpp           1.0.0    2018-11-07 [1] CRAN (R 3.5.0)
+    ##  readr        * 1.3.1    2018-12-21 [1] CRAN (R 3.5.0)
+    ##  readxl         1.2.0    2018-12-19 [1] CRAN (R 3.5.0)
+    ##  rlang          0.3.1    2019-01-08 [1] CRAN (R 3.5.2)
+    ##  rmarkdown      1.11     2018-12-08 [1] CRAN (R 3.5.0)
+    ##  rstudioapi     0.9.0    2019-01-09 [1] CRAN (R 3.5.2)
+    ##  rvest          0.3.2    2016-06-17 [1] CRAN (R 3.5.0)
+    ##  scales       * 1.0.0    2018-08-09 [1] CRAN (R 3.5.0)
+    ##  sessioninfo    1.1.1    2018-11-05 [1] CRAN (R 3.5.0)
+    ##  stringi        1.2.4    2018-07-20 [1] CRAN (R 3.5.0)
+    ##  stringr      * 1.3.1    2018-05-10 [1] CRAN (R 3.5.0)
+    ##  tibble       * 2.0.1    2019-01-12 [1] CRAN (R 3.5.2)
+    ##  tidyr        * 0.8.2    2018-10-28 [1] CRAN (R 3.5.0)
+    ##  tidyselect     0.2.5    2018-10-11 [1] CRAN (R 3.5.0)
+    ##  tidyverse    * 1.2.1    2017-11-14 [1] CRAN (R 3.5.0)
+    ##  withr          2.1.2    2018-03-15 [1] CRAN (R 3.5.0)
+    ##  xfun           0.4      2018-10-23 [1] CRAN (R 3.5.0)
+    ##  xml2           1.2.0    2018-01-24 [1] CRAN (R 3.5.0)
+    ##  yaml           2.2.0    2018-07-25 [1] CRAN (R 3.5.0)
+    ## 
+    ## [1] /Library/Frameworks/R.framework/Versions/3.5/Resources/library

@@ -375,3 +375,9 @@ Note that any `data set`, `column name`, or `file` will be distinguished by a gr
 
 * Chapter 10 considers a setting in which we have input variables but no output variable. 
     + In particular, we present principal components analysis, K-means clustering, and hierarchical clustering
+    
+## Session Info
+
+```{r session info}
+sessioninfo::session_info()
+```

@@ -59,7 +59,7 @@ df.tidy %>%
                      , labels = dollar
                      , limits = c(0, 30)) +
   facet_wrap(facets = vars(type)) +
-  labs(title = "While a general positive relationship exists, increasing the radio\nadvertisement budget increases sales a higher rate than TV or newspapers"
+  labs(title = "Increasing the radio advertisement budget\nincreases sales at a higher rate than both TV or newspapers"
        , caption = advertising.text) +
   my.theme
 ```

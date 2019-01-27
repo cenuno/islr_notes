@@ -19,3 +19,5 @@ mapply(FUN = function(i, j)
   download.file(i, destfile = file.path("00_raw_data", j))
   , raw.csv.files
   , names(raw.csv.files))
+
+# end of script #

@@ -11,8 +11,9 @@ output:
 
 ```{r setup, message = FALSE, warning = FALSE}
 # load necessary packages -----
-library(scales)
+library(gridExtra)
 library(here)
+library(scales)
 library(tidyverse)
 
 # load necessary objects ----
@@ -21,7 +22,7 @@ my.theme <-
   theme(panel.grid = element_blank()
         , plot.caption = element_text(size = 5))
 
-advertising.text <-
+islr.text <-
   "Source: ISLR (http://www-bcf.usc.edu/~gareth/ISL/data.html)"
 
 # set dpi for all chunks ----
@@ -48,7 +49,11 @@ The [`Advertising`](https://github.com/cenuno/islr_notes/blob/master/00_raw_data
 
 While it isn't possible for the client to change the number of sales, they can control the advertising budget in each of the three media. Our goal is to adjust the advertising budget so that we may indirectly increase sales.
 
-In this case, advertising budgets are the *input variables* - $X$ - while `sales` is the *output variable* - $Y$. The relationship between sales as a measured by each media type's advertising budget is shown belown. 
+In this case, advertising budgets are the *input variables* - $X$ - while `sales` is the *output variable* - $Y$. 
+
+$X$ goes by many names: predictors, independent variables, features, or sometimes just variables. The same for $Y$: response or dependent variable.
+
+The relationship between sales as a measured by each media type's advertising budget is shown belown. 
 
 ```{r examine advertising}
 # visualize all three advertising types and their relationship to sales ----
@@ -64,7 +69,55 @@ df.tidy %>%
                      , limits = c(0, 30)) +
   facet_wrap(facets = vars(type)) +
   labs(title = "Increasing the radio advertisement budget\nincreases sales at a higher rate than both TV or newspapers"
-       , caption = advertising.text) +
+       , caption = islr.text) +
   my.theme
 ```
 
+In the formula $Y = f(x) + \epsilon$, $f$ represents the *systematic* information that $X$ provides about $Y$. $\epsilon$ is a random *error term* that is both independent from $X$ and has a mean of zero.
+
+Another example of visualizing the relationship between $X$ and $Y$ uses `income` and `years of education` from the [`Income1`](https://github.com/cenuno/islr_notes/blob/master/00_raw_data/income1.csv) data set.
+
+```{r income and education, message = FALSE, warning = FALSE}
+income1 <- 
+  read_csv(here("00_raw_data", "income1.csv")) %>%
+  select(-X1)
+
+base.plot <-
+  income1 %>%
+  ggplot(aes(x = Education, y = Income)) +
+  geom_point(color = "orchid4") +
+  scale_y_continuous(name = "Annual income"
+                     , labels = function(i) paste0("$", i, "K")) +
+  scale_x_continuous(name = "Years of education"
+                     , breaks = pretty_breaks()) +
+  my.theme +
+  theme(plot.title = element_text(size = 8)
+        , plot.subtitle = element_text(size = 6))
+
+loess.plot <-
+  base.plot + 
+  geom_smooth(se = FALSE
+              , color = "#898b47"
+              , method = "loess") +
+  geom_segment(aes(xend = Education
+                   , yend = loess(Income ~ Education, data = income1)$fitted)
+               , color = "#47898b") +
+  labs(title = "The error terms are between the points and the fitted line"
+       , subtitle = "Some errors are positive (above the line)\nand others are negative (below the line)"
+       , caption = islr.text)
+
+# display both plots side by side ----
+grid.arrange(base.plot + 
+               labs(title = "More years of education are associated\nwith higher annual incomes")
+             , loess.plot
+             , nrow = 1
+             , ncol = 2)
+```
+
+
+
+## Session Info
+
+```{r session info}
+sessioninfo::session_info()
+```

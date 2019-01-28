@@ -160,7 +160,7 @@ The following questions now arise:
 
 For instance, consider a company that is interested in conducting a direct-marketing campaign. The goal is to build a model that predicts how an individual will respond to the direct-marketing campaigin based on their demographics.
 
-In this case, the demographic variables serve as predictors, and response to the marketing campaign (either pos- itive or negative) serves as the outcome. The company is not interested in obtaining a deep understanding of the relationships between each individual predictor and the response; instead, the company simply wants an accurate model to predict the response using the predictors.
+In this case, the demographic variables serve as predictors, and response to the marketing campaign (either positive or negative) serves as the outcome. The company is not interested in obtaining a deep understanding of the relationships between each individual predictor and the response; instead, the company simply wants an accurate model to predict the response using the predictors.
 
 In contrast, consider the [`Advertising` data visualization](https://github.com/cenuno/islr_notes/blob/master/02_statistical_learning/README_files/figure-markdown_github/examine%20advertising-1.png) from earlier. One may be interested in answering questions such as:
 

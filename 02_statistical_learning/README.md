@@ -4,6 +4,9 @@ Cristian E. Nuno
 January 27, 2019
 
 -   [What is Statistical Learning?](#what-is-statistical-learning)
+-   [Why estimate f?](#why-estimate-f)
+-   [How Do We Estimate f?](#how-do-we-estimate-f)
+-   [The Trade-Off Between Prediction Accuracy and Model Interpretability](#the-trade-off-between-prediction-accuracy-and-model-interpretability)
 -   [Session Info](#session-info)
 
 ``` r
@@ -116,6 +119,129 @@ grid.arrange(base.plot +
 In the formula *Y* = *f*(*x*)+*ϵ*, *f* represents the *systematic* information that *X* provides about *Y*. *ϵ* is a random *error term* that is both independent from *X* and has a mean of zero.
 
 **In essence, statistical learning refers to a set of approaches for estimating *f***. In this chapter we outline some of the key theoretical concepts that arise in estimating *f*, as well as tools for evaluating the estimates obtained.
+
+Why estimate f?
+---------------
+
+There are two main reasons that we may wish to estimate *f*: *prediction* and *inference*.
+
+### Prediction
+
+In many situations, a set of inputs *X* are readily available, but the output *Y* cannot be easily obtained. Since the error term averages to zero, we can predict *Y* in this setting using the following formula:
+
+$$\\hat{Y} = \\hat{f}(X)$$
+
+where $\\hat{f}$ represents our estimate for *f*, and $\\hat{Y}$ represents the resulting prediction for *Y*. In this setting, $\\hat{f}$ is often treated as a black box, in the sense that one is not typically concerned with the exact form of *f*, provided that it yields accurate predictions for *Y*.
+
+The accuracy of $\\hat{Y}$ as a prediction for *Y* depends on two quantitines: *reducible error* and *irreducible error*.
+
+In general, $\\hat{f}$ will not be a perfect estimate for *f*, and this inaccuracy will introduce some error. This error is reducible because we can potentially improve the accuracy $\\hat{f}$ by using the most appropriate statistical learning technique to estimate *f*.
+
+But perfection is not possible. This is because *Y* is also a function of *ϵ* - which by definition cannot be predicted using *X*. The quantity *ϵ* may contain both unmeasured variables and variation that are useful in predicting *Y*.
+
+Since we don’t measure them, *f* cannot use them for its prediction.Therefore, variability associated with *ϵ* also affects the accuracy of our predictions.
+
+This is known as the irreducible error, because no matter how well we estimate *f*, we cannot reduce the error introduced by *ϵ*.
+
+**The focus of this book is on techniques for estimating *f* with the aim of minimizing the reducible error.**
+
+It is important to keep in mind that the irreducible error will always provide an upper bound on the accuracy of our prediction for *Y*. *This bound is almost always unknown in practice.*
+
+### Inference
+
+We are often interested in understanding the way that *Y* is affected as *X*1,...,*X*<sub>*p*</sub> change. In this situation we wish to estimate *f*, but our goal is not necessarily to make predictions for *Y*.
+
+We instead want to understand the relationship between *X* and *Y*, or more specifically, to understand how *Y* changes as a function of *X*1,...,*X*<sub>*p*</sub>. Now $\\hat{f}$ cannot be treated as a black box, because we need to know its exact form.
+
+The following questions now arise:
+
+-   Which predictors are associated with the response?
+    -   Identifying the few important predictors among a large set of possible variables can be extremely useful, depending on the application.
+-   What is the relationship between the response and each predictor?
+
+-   Can the relationship between *Y* and each predictor be adequately summarized using a linear equation, or is the relationship more complicated?
+
+For instance, consider a company that is interested in conducting a direct-marketing campaign. The goal is to build a model that predicts how an individual will respond to the direct-marketing campaigin based on their demographics.
+
+In this case, the demographic variables serve as predictors, and response to the marketing campaign (either pos- itive or negative) serves as the outcome. The company is not interested in obtaining a deep understanding of the relationships between each individual predictor and the response; instead, the company simply wants an accurate model to predict the response using the predictors.
+
+In contrast, consider the [`Advertising` data visualization](https://github.com/cenuno/islr_notes/blob/master/02_statistical_learning/README_files/figure-markdown_github/examine%20advertising-1.png) from earlier. One may be interested in answering questions such as:
+
+-   Which media contribute to sales?
+
+-   Which media generate the biggest boost in sales?
+
+-   How much increase in sales is associated with a given increase in TV advertising?
+
+This situation falls into the inference paradigm.
+
+Another example involves modeling the brand of a product that a customer might purchase based on variables such as price, store location, discount levels, competition price, and so forth.
+
+In this situation one might really be most interested in **how each of the individual variables affects** the probability of purchase. For instance, what effect will changing the price of a product have on sales? This is an example of modeling for inference.
+
+Finally, some modeling could be conducted both for prediction and inference. For example, in a real estate setting, one may seek to relate values of homes to inputs such as crime rate, zoning, distance from a river, air quality, schools, income level of community, size of houses, and so forth.
+
+In this case one might be interested in how the individual input variables affect the prices—that is, *how much extra will a house be worth if it has a view of the river*? This is an **inference** problem.
+
+Alternatively, one may simply be interested in predicting the value of a home given its characteristics: *is this house under- or over-valued*? This is a **prediction** problem.
+
+Depending on whether our ultimate goal is prediction, inference, or a combination of the two, different methods for estimating *f* may be appropriate.
+
+For example, *linear models* allow for relatively simple and interpretable inference, but may not yield as accurate predictions as some other approaches.
+
+In contrast, some of the highly non-linear approaches that we discuss in the later chapters of this book can potentially provide quite accurate predictions for *Y*, but this comes at the expense of a less interpretable model for which inference is more challenging.
+
+How Do We Estimate f?
+---------------------
+
+Throughout this book, we explore many linear and non-linear approaches for estimating *f*. However, these methods generally share certain characteristics.
+
+We will always assume that we have observed a set of *n* different data points. These observations are called the *training data* because we will use these observations to train, or teach, our method how to estimate *f*.
+
+Let *x*<sub>*i**j*</sub> represent the value of the *j*<sup>*t**h*</sup> predictor, or input, for observation *i*, where *i* = 1,2,...,*n* and *j* = 1,2,...,*p*. Correspondingly, let *y*<sub>*i*</sub> represent the response variable for the *i*<sup>*t**h*</sup> observation. Then our training data consist of
+
+{(*x*<sub>1</sub>,*y*<sub>1</sub>),(*x*<sub>2</sub>,*y*<sub>2</sub>),...,(*x*<sub>*n*</sub>,*y*<sub>*n*</sub>)} where *x*<sub>*i*</sub> ={(*x*<sub>*i*1</sub>,*x*<sub>*i*2</sub>,...,*x*<sub>*i**p*</sub>)}**<sup>*T*</sup>.
+
+Our goal is to apply a statistical learning method to the training data in order to estimate the unknown function *f*. In other words, we want to find a function *f* such that *Y* ≈ *f*(*X*) for any observation (*X*, *Y*).
+
+Broadly speaking, most statistical learning methods for this task can be characterized as either parametric or non-parametric.
+
+### Parametric Methods
+
+Parametric methods involve a two-step model-based approach.
+
+1.  Make an assumption about the functional form, or shape, of *f* (i.e. a linear model of *f*(*X*) = *β*<sub>0</sub> + *β*<sub>1</sub>*X*<sub>1</sub> + *β*<sub>2</sub>*X*<sub>2</sub> +... + *β*<sub>*p*</sub>*X*<sub>*p*</sub>).
+
+2.  After a model has been selected, we need a procedure that uses the training data to *fit* or *train* the model. In the case of the linear model in step 1, we need to estimate the parameters *β*<sub>0</sub>,*β*<sub>1</sub>,...,*β*<sub>*p*</sub>. We want to find the values of these parameters such that *Y* ≈ *β*<sub>0</sub> + *β*<sub>1</sub>*X*<sub>1</sub> + *β*<sub>2</sub>*X*<sub>2</sub> +... + *β*<sub>*p*</sub>*X*<sub>*p*</sub>. A common approach for fitting linear models is the *ordinary least squares* approach.
+
+The model-based approach just described is referred to as *parametric*; it reduces the problem of estimating *f* down to one of estimating a set of paramters.
+
+Assuming a parametric form for *f* simplifies the problem of estimating *f* because it is generally much easier to estimate a set of parameters, such as *β*<sub>0</sub>,*β*<sub>1</sub>,...,*β*<sub>*p*</sub> in the linear model than it is to fit an entirely arbitrary function *f*.
+
+The potential disadvantage of a parametric approach is that the model we choose will usually not match the true unknown form of *f*. If the chosen model is too far from the true *f*, then our estimate will be poor.
+
+We can try to address this problem by choosing flexible models that can fit many different possible functional forms for *f*. But in general, fitting a more flexible model requires estimating a greater number of parameters.
+
+These more complex models can lead to a phenomenon known as *overfitting* the data, which essentially means they follow the errors, or noise, too closely. Overfitting is an undesirable situation because the fit obtained will not yield accurate estimates of the response on new observations that were not part of the original training data set.
+
+From the `Income` data set, a parametric approach to understanding `income` described by both `education` and `seniority` as a linear model would look like this:
+
+*i**n**c**o**m**e* ≈ *β*<sub>0</sub> + *β*<sub>1</sub> \* *e**d**u**c**a**t**i**o**n* + *β*<sub>2</sub> \* *s**e**n**i**o**r**i**t**y*
+
+Since we have assumed a linear relationship between the response and the two predictors, the entire fitting problem reduces to estimating *β*<sub>0</sub>,*β*<sub>1</sub>, and *β*<sub>2</sub>, which we do using least squares linear regression.
+
+### Non-parametric methods
+
+Non-parametric methods do not make explicit assumptions about the functional form of *f*. Instead they seek an estimate of *f* that gets as close to the data points as possible without being too rough or wiggly.
+
+Such approaches can have a major advantage over parametric approaches: by avoiding the assumption of a particular functional form for *f*, they have the potential to accurately fit a wider range of possible shapes for *f*.
+
+Any parametric approach brings with it the possibility that the functional form used to estimate *f* is very different from the true *f*, in which case the resulting model will not fit the data well.
+
+In contrast, non-parametric approaches completely avoid this danger, since essentially no assumption about the form of *f* is made. But non-parametric approaches do suffer from a major disadvantage: since they do not reduce the problem of estimating *f* to a small number of parameters, a very large number of observations (far more than is typically needed for a parametric approach) is required in order to obtain an accurate estimate for *f*.
+
+The Trade-Off Between Prediction Accuracy and Model Interpretability
+--------------------------------------------------------------------
 
 Session Info
 ------------

@@ -1,12 +1,13 @@
 Statistical Learning
 ================
 Cristian E. Nuno
-January 27, 2019
+January 29, 2019
 
 -   [What is Statistical Learning?](#what-is-statistical-learning)
 -   [Why estimate f?](#why-estimate-f)
 -   [How Do We Estimate f?](#how-do-we-estimate-f)
 -   [The Trade-Off Between Prediction Accuracy and Model Interpretability](#the-trade-off-between-prediction-accuracy-and-model-interpretability)
+-   [Supervised Versus Unsupervised Learning](#supervised-versus-unsupervised-learning)
 -   [Session Info](#session-info)
 
 ``` r
@@ -243,6 +244,76 @@ In contrast, non-parametric approaches completely avoid this danger, since essen
 The Trade-Off Between Prediction Accuracy and Model Interpretability
 --------------------------------------------------------------------
 
+Of the many methods that we examine in this book, some are less flexible, or more restrictive, in the sense that they can produce just a relatively small range of shapes to estimate *f*.
+
+For example, linear regression is a relatively inflexible approach, because it can only generate linear functions. On the other hand, thin plate splines are considerably more flexible because they can generate a much wider range of possible shapes to estimate *f*.
+
+``` r
+# store statistical learning models 
+models <-
+  tibble(method = c("Subset Selection"
+                   , "Lasso"
+                   , "Least Squares"
+                   , "Generalized Additive Models"
+                   , "Trees"
+                   , "Bagging, Boosting"
+                   , "Support Vector Machines")
+         , flexibility = c(0.05
+                           , 0.1
+                           , 0.25
+                           , 0.6
+                           , 0.6
+                           , 0.85
+                           , 0.78)
+         , interpretability = c(0.9
+                                , 0.85
+                                , 0.7
+                                , 0.5
+                                , 0.45
+                                , 0.25
+                                , 0.05))
+
+# visualize each model's flexibility v. interpretability tradeoff -----
+models %>%
+  ggplot(aes(x = flexibility, y = interpretability, label = method)) +
+  geom_text(color = "tan4") +
+  scale_x_continuous(name = "Flexibility"
+                     , limits = c(0, 1)
+                     , breaks = c(0, 1)
+                     , labels = c("Low", "High")) +
+  scale_y_continuous(name = "Interpretability"
+                     , limits = c(0, 1)
+                     , breaks = c(0, 1)
+                     , labels = c("Low", "High")) +
+  labs(title = "Tradeoff between flexibility and interpretability amongst statistical learning methods"
+       , subtitle = "In general, as the flexibility of a method increases, its interpretability decreases"
+       , caption = "Source: ISLR, Chapter 2") +
+  my.theme
+```
+
+![](README_files/figure-markdown_github/flexibility%20versus%20interpretability-1.png)
+
+The visual up above prokes a rational question: *why would we ever choose to use a more restrictive method instead of a very flexible approach?*
+
+There are several reasons that we might prefer a more restrictive model. **If we are mainly interested in inference, then restrictive models are much more interpretable.**
+
+For instance, when inference is the goal, the linear model may be a good choice since it will be quite easy to understand the relationship between *Y* and *X*<sub>1</sub>,*X*<sub>2</sub>,...,*X*<sub>*p*</sub>.
+
+In contrast, very flexible approaches can lead to such complicated estimates of *f* that it is difficult to understand how any individual predictor is associated with the response.
+
+-   Least squares linear regression: relatively inflexible but is quite interpretable.
+
+-   Lasso: relies upon the linear model but uses an alternative fitting procedure for estimating the coefficients *β*<sub>0</sub>, *β*<sub>1</sub>, . . . , *β*<sub>*p*</sub>. The new procedure is more restrictive in estimating the coefficients, and sets a number of them to exactly zero. Hence in this sense the lasso is a less flexible approach than linear regression. It is also more interpretable than linear regression, because in the final model the response variable will only be related to a small subset of the predictors (namely those with nonzero coefficient estimates).
+
+-   Generalized additive models (GAMs): extend the linear model to allow for certain non-linear relationships. Consequently, GAMs are more flexible than linear regression. They are also somewhat less interpretable than linear regression, because the relationship between each predictor and the response is now modeled using a curve.
+
+-   Bagging, boosting, and support vector machines: fully non-linear methods with non-linear kernels are highly flexible approaches that are harder to interpret.
+
+We have established that when **inference** is the goal, there are clear advantages to using simple and relatively inflexible statistical learning methods. We will often obtain more accurate predictions using a less flexible method. This phenomenon, which may seem counterintuitive at first glance, has to do with the potential for overfitting in highly flexible methods.
+
+Supervised Versus Unsupervised Learning
+---------------------------------------
+
 Session Info
 ------------
 
@@ -260,7 +331,7 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-01-27                  
+    ##  date     2019-01-29                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package     * version date       lib source        

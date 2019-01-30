@@ -1,7 +1,7 @@
 Statistical Learning
 ================
 Cristian E. Nuno
-January 29, 2019
+January 30, 2019
 
 -   [What is Statistical Learning?](#what-is-statistical-learning)
 -   [Why estimate f?](#why-estimate-f)
@@ -314,6 +314,18 @@ We have established that when **inference** is the goal, there are clear advanta
 Supervised Versus Unsupervised Learning
 ---------------------------------------
 
+Most statistical learning problems fall into one of two categories: supervised or unsupervised.
+
+The supervised learning domain requires that for each observation of the predictor measurement(s) *x*<sub>*i*</sub>, *i* = 1,...,*n* there is an associated response measurement *y*<sub>*i*</sub>. Here, the goal is to fit a model that relates the response to the predictors, with the aim of accurately predicting the response for future observations (**prediction**) or better understanding the relationship between the response and the predictors (**inference**). Many classical statistical learning methods such as linear regression and logistic regression, as well as more modern approaches such as GAM, boosting, and support vector machines, operate in the supervised learning domain.
+
+Unsupervised learning requires that for every observation *i* = 1,...,*n*, we observe a vector of measurements *x*<sub>*i*</sub> but no associated response *y*<sub>*i*</sub>. It is not possible to fit a linear regression model, since there is no response variable to predict. In this setting, we are in some sense working blind; the situation is referred to as unsupervised because we lack a response variable that can supervise our analysis.
+
+We can seek to understand the relationships between the variables or between the observations using unsupervised learning techniques.
+
+One statistical learning tool that we may use in this setting is cluster analysis, or clustering. The goal of cluster analysis is to ascertain, on the basis of *x*<sub>1</sub>,...,*x*<sub>*n*</sub>, whether the observations fall into relatively distinct groups.
+
+Many problems fall naturally into the supervised or unsupervised learning paradigms. However, sometimes the question of whether an analysis should be considered supervised or unsupervised is less clear-cut. For instance, suppose that we have a set of *n* observations. For *m* of the observations, where *m* &lt; *n*, we have both predictor measurements and a response measurement. For the remaining *n* − *m* observations, we have predictor measurements but no response measurement. Such a scenario can arise if the predictors can be measured relatively cheaply but the corresponding responses are much more expensive to collect. We refer to this setting as a *semi-supervised* learning problem. This topic is beyond the scope of this book.
+
 Session Info
 ------------
 
@@ -331,7 +343,7 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-01-29                  
+    ##  date     2019-01-30                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package     * version date       lib source        

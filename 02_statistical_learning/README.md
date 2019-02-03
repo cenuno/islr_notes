@@ -1,20 +1,25 @@
 Statistical Learning
 ================
 Cristian E. Nuno
-January 30, 2019
+February 03, 2019
 
 -   [What is Statistical Learning?](#what-is-statistical-learning)
--   [Why estimate f?](#why-estimate-f)
--   [How Do We Estimate f?](#how-do-we-estimate-f)
--   [The Trade-Off Between Prediction Accuracy and Model Interpretability](#the-trade-off-between-prediction-accuracy-and-model-interpretability)
--   [Supervised Versus Unsupervised Learning](#supervised-versus-unsupervised-learning)
+    -   [Why estimate f?](#why-estimate-f)
+    -   [How Do We Estimate f?](#how-do-we-estimate-f)
+    -   [The Trade-Off Between Prediction Accuracy and Model Interpretability](#the-trade-off-between-prediction-accuracy-and-model-interpretability)
+    -   [Supervised Versus Unsupervised Learning](#supervised-versus-unsupervised-learning)
+    -   [Regression Versus Classification Problems](#regression-versus-classification-problems)
+-   [Assessing Model Accuracy](#assessing-model-accuracy)
+    -   [Measuring the Quality of Fit](#measuring-the-quality-of-fit)
 -   [Session Info](#session-info)
 
 ``` r
 # load necessary packages -----
 library(gridExtra)
 library(here)
+library(ISLR)
 library(scales)
+library(splines)
 library(tidyverse)
 
 # load necessary objects ----
@@ -24,7 +29,12 @@ my.theme <-
         , plot.caption = element_text(size = 5))
 
 islr.text <-
-  "Source: ISLR (http://www-bcf.usc.edu/~gareth/ISL/data.html)"
+  "Source: ISLR (http://www-bcf.usc.edu/~gareth/ISL/data.html) | made by @cenuno_"
+
+wage.text <- "Source: Wage and other data for a group of 3000 male workers in the Mid-Atlantic region | made by @cenuno_"
+
+chapter.text <-
+  "Source: ISLR, Chapter 2 | made by @cenuno_"
 
 # set dpi for all chunks ----
 knitr::opts_chunk$set(dpi = 300)
@@ -121,12 +131,11 @@ In the formula *Y* = *f*(*x*)+*ϵ*, *f* represents the *systematic* informat
 
 **In essence, statistical learning refers to a set of approaches for estimating *f***. In this chapter we outline some of the key theoretical concepts that arise in estimating *f*, as well as tools for evaluating the estimates obtained.
 
-Why estimate f?
----------------
+### Why estimate f?
 
 There are two main reasons that we may wish to estimate *f*: *prediction* and *inference*.
 
-### Prediction
+#### Prediction
 
 In many situations, a set of inputs *X* are readily available, but the output *Y* cannot be easily obtained. Since the error term averages to zero, we can predict *Y* in this setting using the following formula:
 
@@ -148,7 +157,7 @@ This is known as the irreducible error, because no matter how well we estimate *
 
 It is important to keep in mind that the irreducible error will always provide an upper bound on the accuracy of our prediction for *Y*. *This bound is almost always unknown in practice.*
 
-### Inference
+#### Inference
 
 We are often interested in understanding the way that *Y* is affected as *X*1,...,*X*<sub>*p*</sub> change. In this situation we wish to estimate *f*, but our goal is not necessarily to make predictions for *Y*.
 
@@ -192,8 +201,7 @@ For example, *linear models* allow for relatively simple and interpretable infer
 
 In contrast, some of the highly non-linear approaches that we discuss in the later chapters of this book can potentially provide quite accurate predictions for *Y*, but this comes at the expense of a less interpretable model for which inference is more challenging.
 
-How Do We Estimate f?
----------------------
+### How Do We Estimate f?
 
 Throughout this book, we explore many linear and non-linear approaches for estimating *f*. However, these methods generally share certain characteristics.
 
@@ -207,7 +215,7 @@ Our goal is to apply a statistical learning method to the training data in order
 
 Broadly speaking, most statistical learning methods for this task can be characterized as either parametric or non-parametric.
 
-### Parametric Methods
+#### Parametric Methods
 
 Parametric methods involve a two-step model-based approach.
 
@@ -231,7 +239,7 @@ From the `Income` data set, a parametric approach to understanding `income` desc
 
 Since we have assumed a linear relationship between the response and the two predictors, the entire fitting problem reduces to estimating *β*<sub>0</sub>,*β*<sub>1</sub>, and *β*<sub>2</sub>, which we do using least squares linear regression.
 
-### Non-parametric methods
+#### Non-parametric methods
 
 Non-parametric methods do not make explicit assumptions about the functional form of *f*. Instead they seek an estimate of *f* that gets as close to the data points as possible without being too rough or wiggly.
 
@@ -241,8 +249,7 @@ Any parametric approach brings with it the possibility that the functional form 
 
 In contrast, non-parametric approaches completely avoid this danger, since essentially no assumption about the form of *f* is made. But non-parametric approaches do suffer from a major disadvantage: since they do not reduce the problem of estimating *f* to a small number of parameters, a very large number of observations (far more than is typically needed for a parametric approach) is required in order to obtain an accurate estimate for *f*.
 
-The Trade-Off Between Prediction Accuracy and Model Interpretability
---------------------------------------------------------------------
+### The Trade-Off Between Prediction Accuracy and Model Interpretability
 
 Of the many methods that we examine in this book, some are less flexible, or more restrictive, in the sense that they can produce just a relatively small range of shapes to estimate *f*.
 
@@ -287,7 +294,7 @@ models %>%
                      , labels = c("Low", "High")) +
   labs(title = "Tradeoff between flexibility and interpretability amongst statistical learning methods"
        , subtitle = "In general, as the flexibility of a method increases, its interpretability decreases"
-       , caption = "Source: ISLR, Chapter 2") +
+       , caption = chapter.text) +
   my.theme
 ```
 
@@ -311,8 +318,7 @@ In contrast, very flexible approaches can lead to such complicated estimates of 
 
 We have established that when **inference** is the goal, there are clear advantages to using simple and relatively inflexible statistical learning methods. We will often obtain more accurate predictions using a less flexible method. This phenomenon, which may seem counterintuitive at first glance, has to do with the potential for overfitting in highly flexible methods.
 
-Supervised Versus Unsupervised Learning
----------------------------------------
+### Supervised Versus Unsupervised Learning
 
 Most statistical learning problems fall into one of two categories: supervised or unsupervised.
 
@@ -325,6 +331,130 @@ We can seek to understand the relationships between the variables or between the
 One statistical learning tool that we may use in this setting is cluster analysis, or clustering. The goal of cluster analysis is to ascertain, on the basis of *x*<sub>1</sub>,...,*x*<sub>*n*</sub>, whether the observations fall into relatively distinct groups.
 
 Many problems fall naturally into the supervised or unsupervised learning paradigms. However, sometimes the question of whether an analysis should be considered supervised or unsupervised is less clear-cut. For instance, suppose that we have a set of *n* observations. For *m* of the observations, where *m* &lt; *n*, we have both predictor measurements and a response measurement. For the remaining *n* − *m* observations, we have predictor measurements but no response measurement. Such a scenario can arise if the predictors can be measured relatively cheaply but the corresponding responses are much more expensive to collect. We refer to this setting as a *semi-supervised* learning problem. This topic is beyond the scope of this book.
+
+### Regression Versus Classification Problems
+
+Variables can be characterized as either *quantitative* or *qualitative* (also known as categorical). Quantitative variables take on numeric values, such as the number of shots made in an NBA game. Qualitative variables take on values in one of *K* different *classes* or categories, such as the name of the division that groups NBA teams by geography.
+
+We tend to refer to problems with a quantitative response as *regression* problems, while those involving a qualitative response are often referred to as *classification problems*. However, the distinction is not always that crisp.
+
+Least squares linear regression (Chapter 3) is used with a quantitative response, whereas logistic regression (Chapter 4) is typically used with a qualitative (two-class, or *binary*) response.
+
+Yet because logistic regression estimates class probabilities, it can be viewed as both a regression and classification method. Some statistical methods, such as *K-nearest neighbors* (Chapters 2 and 4) and *boosting* (Chapter 8), can be used in the case of either quantitative or qualitative responses.
+
+Most of the statistical learning methods discussed in this book can be applied regardless of the predictor variable type, provided that any qualitative predictors are *properly coded* before the analysis is performed.
+
+Assessing Model Accuracy
+------------------------
+
+One of the key aims of this book is to introduce the reader to a wide range of statistical learning methods that extend far beyond the standard linear regression approach. *Why is it necessary to introduce so many different statistical learning approaches, rather than just a single best method?*
+
+**There is no free lunch in statistics**: no one method dominates all others over all possible data sets. Selecting the best approach can be one of the most challenging parts of performing statistical learning in practice.
+
+On a particular data set, one specific method may work best, but some other method may work better on a similar but different data set. Hence it is an important task to decide for any given set of data which method produces the best results.
+
+### Measuring the Quality of Fit
+
+In order to evaluate the performance of a statistical learning method on a given data set, we need some way to measure how well its predictions actually match the observed data.
+
+That is, we need to quantify the extent to which the predicted response value for a given observation is close to the true response value for that observation.
+
+In the regression setting, the most commonly-used measure is the **mean squared error (MSE)**, given by where *f*(*x*<sub>*i*</sub>) is the prediction that *f* gives for the *i*<sup>*t**h*</sup> observation. The MSE will be **small** if the predicted responses are very close to the true responses, and will be **large** if for some of the observations, the predicted and true responses differ substantially.
+
+The MSE is computed using the training data that was used to fit the model, and so should more accurately be referred to as the *training MSE*. But in general, we do not really care how well the method works on the training data.
+
+Instead, **we are interested in the accuracy of the predictions that we obtain when we apply our method to previously unseen test data**. We want to choose the method that gives the lowest test MSE, as opposed to the lowest training MSE.
+
+In other words, if we had a large number of test observations, we could compute the average squared prediction error for these test observations (*x*<sub>0</sub>, *y*<sub>0</sub>) as $Ave(y\_0) - \\hat{f}(x\_0))^2$. We’d like to select the model for which the average of this quantity—the test MSE—is as small as possible.
+
+How can we go about trying to select a method that minimizes the test MSE? In some settings, we may have a test data set available—that is, we may have access to a set of observations that were not used to train the statistical learning method.
+
+In that case, we evaluate the average squared prediction error for the test observations and select the learning method for which the test MSE is smallest.
+
+But what if no test observations are available? In that case, **do not** simply selecting a statistical learning method that minimizes the training MSE.
+
+There is no guarantee that the method with the lowest training MSE will also have the lowest test MSE. Roughly speaking, the problem is that many statistical methods specifically estimate coefficients so as to minimize the training set MSE. For these methods, the training set MSE can be quite small, but the test MSE is often much larger.
+
+``` r
+# using the Wage dataset, visualize 3 estimates of f ----
+# note: in this case, assume true f is a generalized additive model
+f.estimates <-
+  Wage %>%
+  ggplot(aes(x = age, y = wage)) +
+  geom_point(color = "gray") +
+  geom_smooth(se = FALSE
+              , color = "black"
+              , method = "gam"
+              , formula = y ~ s(x, bs = "cs")) +
+  geom_smooth(se = FALSE
+              , color = "#7eb837"
+              , method = "lm") +
+  geom_smooth(se = FALSE
+              , color = "#377eb8"
+              , method = "lm"
+              , formula = y ~ splines::bs(x, 6)) +
+  geom_smooth(se = FALSE
+              , color = "#b87137"
+              , method = "lm"
+              , formula = y ~ splines::bs(x, 22)) +
+  xlab("Age") +
+  ylab("Hourly wage") +
+  scale_y_continuous(labels = dollar) +
+  labs(title = "Three estimates of f, shown in black"
+       , subtitle = "Linear regression is in green and two smoothing spline fits (blue and brown)"
+       , caption = wage.text) +
+  my.theme +
+  theme(plot.title = element_text(size = 8)
+        , plot.subtitle = element_text(size = 6))
+  
+# create sample data for mse for the 3 f_estimates from above ----
+mse.df <-
+    tibble(flexibility = c(2, 2, 6, 6, 22, 22)
+           , mse = c(2.1, 1.75, 1.1, 0.9, 1.55, 0.39)
+           , type = rep(c("test", "training"), 3)
+           , f_estimate = c(rep("linear", 2)
+                            , rep("smoothing spline (df = 6)", 2)
+                            , rep("smoothing spline (df = 22)", 2))) %>%
+    mutate(f_estimate = factor(f_estimate
+                               , levels = c("linear"
+                                            , "smoothing spline (df = 6)"
+                                            , "smoothing spline (df = 22)")))
+  
+# visualize training, test and minimum possible test MSE over all methods ----
+mse.plot <-
+  mse.df %>%
+  ggplot(aes(x = flexibility, y = mse, label = f_estimate)) +
+  geom_smooth(aes(color = type)
+              , method = "loess"
+              , se = FALSE) +
+  geom_point(aes(color = f_estimate)
+             , shape = 15
+             , size = 4) +
+  scale_color_manual(values = c("#7eb837"
+                                , "#b87137"
+                                , "#377eb8"
+                                , "#b83737"
+                                , "gray")) +
+  geom_hline(yintercept = 1
+             , color = "black"
+             , linetype = "dashed") +
+  guides(color = FALSE) +
+  xlab("Flexibility (measured in degrees of freedom)") +
+  ylab("Mean Squared Error") +
+  labs(title = "Squares represent the training and test MSEs\nfor the three fits shown in the left-hand panel"
+       , subtitle = "Training (grey curve), test (red curve), and\nminimum possible test MSE over all methods (dashed line)"
+       , caption = chapter.text) +
+  my.theme +
+  theme(plot.title = element_text(size = 8)
+        , plot.subtitle = element_text(size = 6))
+  
+# display both plots side by side ----
+grid.arrange(f.estimates, mse.plot, ncol = 2)
+```
+
+![](README_files/figure-markdown_github/mse-1.png)
+
+Notice the *U-shape* in the test MSE. This is a fundamental property of statistical learning that holds regardless of the particular data set at hand and regardless of the statistical method being used: **as model flexibility increases, training MSE will decrease, but the test MSE may not**.
 
 Session Info
 ------------
@@ -343,14 +473,14 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-01-30                  
+    ##  date     2019-02-03                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package     * version date       lib source        
     ##  assertthat    0.2.0   2017-04-11 [1] CRAN (R 3.5.0)
     ##  backports     1.1.3   2018-12-14 [1] CRAN (R 3.5.0)
     ##  bindr         0.1.1   2018-03-13 [1] CRAN (R 3.5.0)
-    ##  bindrcpp      0.2.2   2018-03-29 [1] CRAN (R 3.5.0)
+    ##  bindrcpp    * 0.2.2   2018-03-29 [1] CRAN (R 3.5.0)
     ##  broom         0.5.1   2018-12-05 [1] CRAN (R 3.5.0)
     ##  cellranger    1.1.0   2016-07-27 [1] CRAN (R 3.5.0)
     ##  cli           1.0.1   2018-09-25 [1] CRAN (R 3.5.0)
@@ -370,6 +500,7 @@ sessioninfo::session_info()
     ##  hms           0.4.2   2018-03-10 [1] CRAN (R 3.5.0)
     ##  htmltools     0.3.6   2017-04-28 [1] CRAN (R 3.5.0)
     ##  httr          1.4.0   2018-12-11 [1] CRAN (R 3.5.0)
+    ##  ISLR        * 1.2     2017-10-20 [1] CRAN (R 3.5.0)
     ##  jsonlite      1.6     2018-12-07 [1] CRAN (R 3.5.0)
     ##  knitr         1.21    2018-12-10 [1] CRAN (R 3.5.2)
     ##  labeling      0.3     2014-08-23 [1] CRAN (R 3.5.0)
@@ -377,6 +508,8 @@ sessioninfo::session_info()
     ##  lazyeval      0.2.1   2017-10-29 [1] CRAN (R 3.5.0)
     ##  lubridate     1.7.4   2018-04-11 [1] CRAN (R 3.5.0)
     ##  magrittr      1.5     2014-11-22 [1] CRAN (R 3.5.0)
+    ##  Matrix        1.2-15  2018-11-01 [1] CRAN (R 3.5.2)
+    ##  mgcv          1.8-26  2018-11-21 [1] CRAN (R 3.5.2)
     ##  modelr        0.1.2   2018-05-11 [1] CRAN (R 3.5.0)
     ##  munsell       0.5.0   2018-06-12 [1] CRAN (R 3.5.0)
     ##  nlme          3.1-137 2018-04-07 [1] CRAN (R 3.5.2)

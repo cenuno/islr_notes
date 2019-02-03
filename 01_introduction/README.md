@@ -1,7 +1,7 @@
 Introduction
 ================
 Cristian E. Nuno
-January 27, 2019
+February 03, 2019
 
 -   [Introduction](#introduction)
     -   [Wage Data](#wage-data)
@@ -23,11 +23,11 @@ library(scales)     # scale functions for visualizations
 library(tidyverse)  # data science packages
 
 # load necessary objects ----
-wage.text <- "Source: Wage and other data for a group of 3000 male workers in the Mid-Atlantic region"
+wage.text <- "Source: Wage and other data for a group of 3000 male workers in the Mid-Atlantic region | made by @cenuno_"
 
-stock.text <- "Source: Daily percentage returns for the S&P 500 stock index between 2001 and 2005"
+stock.text <- "Source: Daily percentage returns for the S&P 500 stock index between 2001 and 2005 | made by @cenuno_"
 
-gene.text <- "Source: NCI microarray data that contains cancer type and expression levels on 6,830 genes from 64 cancer cell lines"
+gene.text <- "Source: NCI microarray data that contains cancer type and expression levels on 6,830 genes from 64 cancer cell lines | made by @cenuno_"
 
 my.theme <- 
   theme_minimal() + 
@@ -443,7 +443,7 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-01-27                  
+    ##  date     2019-02-03                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package      * version  date       lib source        

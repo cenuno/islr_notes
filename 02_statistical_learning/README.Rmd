@@ -436,8 +436,8 @@ mse.plot <-
   guides(color = FALSE) +
   xlab("Flexibility (measured in degrees of freedom)") +
   ylab("Mean Squared Error") +
-  labs(title = "Squares represent the training and test MSEs\nfor the three fits shown in the left-hand panel"
-       , subtitle = "Training (grey curve), test (red curve), and\nminimum possible test MSE over all methods (dashed line)"
+  labs(title = "The green, blue and brown squares indicate the MSEs\nthe corresponding models in the left-hand panel"
+       , subtitle = "Training (gray curve), test (red curve), and\nminimum possible test MSE over all methods (dashed line)"
        , caption = chapter.text) +
   my.theme +
   theme(plot.title = element_text(size = 8)

@@ -1,7 +1,7 @@
 Statistical Learning
 ================
 Cristian E. Nuno
-February 03, 2019
+February 09, 2019
 
 -   [What is Statistical Learning?](#what-is-statistical-learning)
     -   [Why estimate f?](#why-estimate-f)
@@ -11,16 +11,22 @@ February 03, 2019
     -   [Regression Versus Classification Problems](#regression-versus-classification-problems)
 -   [Assessing Model Accuracy](#assessing-model-accuracy)
     -   [Measuring the Quality of Fit](#measuring-the-quality-of-fit)
+    -   [The Bias-Variance Trade-Off](#the-bias-variance-trade-off)
 -   [Session Info](#session-info)
 
 ``` r
 # load necessary packages -----
+library(broom)
 library(gridExtra)
 library(here)
 library(ISLR)
+library(mgcv)
 library(scales)
 library(splines)
 library(tidyverse)
+
+# load necessary functions ----
+source(here("00_functions", "01_build_single_models.R"))
 
 # load necessary objects ----
 my.theme <- 
@@ -38,17 +44,6 @@ chapter.text <-
 
 # set dpi for all chunks ----
 knitr::opts_chunk$set(dpi = 300)
-
-# load necessary data ----
-df <- 
-  read_csv(here("00_raw_data", "advertising.csv")) %>%
-  # drop row number column
-  select(-X1)
-
-# convert from wide to long ----
-df.tidy <-
-  df %>%
-  gather(key = "type", value = "budget", -sales)
 ```
 
 What is Statistical Learning?
@@ -67,6 +62,17 @@ In this case, advertising budgets are the *input variables* - *X* - while `sales
 The relationship between sales as a measured by each media type's advertising budget is shown belown.
 
 ``` r
+# load necessary data ----
+df <- 
+  read_csv(here("00_raw_data", "advertising.csv")) %>%
+  # drop row number column
+  select(-X1)
+
+# convert from wide to long ----
+df.tidy <-
+  df %>%
+  gather(key = "type", value = "budget", -sales)
+
 # visualize all three advertising types and their relationship to sales ----
 df.tidy %>%
   ggplot(aes(x = budget, y = sales, color = type)) +
@@ -89,10 +95,12 @@ df.tidy %>%
 Another example of visualizing the relationship between *X* and *Y* uses `income` and `years of education` from the [`Income1`](https://github.com/cenuno/islr_notes/blob/master/00_raw_data/income1.csv) data set.
 
 ``` r
+# load necessary data ----
 income1 <- 
   read_csv(here("00_raw_data", "income1.csv")) %>%
   select(-X1)
 
+# scatter plot of income and education ----
 base.plot <-
   income1 %>%
   ggplot(aes(x = Education, y = Income)) +
@@ -105,6 +113,8 @@ base.plot <-
   theme(plot.title = element_text(size = 8)
         , plot.subtitle = element_text(size = 6))
 
+# add a loess line to the scatter plot ----
+# note: also include residuals from loess line to actual points
 loess.plot <-
   base.plot + 
   geom_smooth(se = FALSE
@@ -256,7 +266,7 @@ Of the many methods that we examine in this book, some are less flexible, or mor
 For example, linear regression is a relatively inflexible approach, because it can only generate linear functions. On the other hand, thin plate splines are considerably more flexible because they can generate a much wider range of possible shapes to estimate *f*.
 
 ``` r
-# store statistical learning models 
+# store statistical learning models ----
 models <-
   tibble(method = c("Subset Selection"
                    , "Lasso"
@@ -280,7 +290,7 @@ models <-
                                 , 0.25
                                 , 0.05))
 
-# visualize each model's flexibility v. interpretability tradeoff -----
+# visualize each model's flexibility v. interpretability trade-off -----
 models %>%
   ggplot(aes(x = flexibility, y = interpretability, label = method)) +
   geom_text(color = "tan4") +
@@ -292,7 +302,7 @@ models %>%
                      , limits = c(0, 1)
                      , breaks = c(0, 1)
                      , labels = c("Low", "High")) +
-  labs(title = "Tradeoff between flexibility and interpretability amongst statistical learning methods"
+  labs(title = "Trade-off between flexibility and interpretability amongst statistical learning methods"
        , subtitle = "In general, as the flexibility of a method increases, its interpretability decreases"
        , caption = chapter.text) +
   my.theme
@@ -376,85 +386,83 @@ But what if no test observations are available? In that case, **do not** simply 
 There is no guarantee that the method with the lowest training MSE will also have the lowest test MSE. Roughly speaking, the problem is that many statistical methods specifically estimate coefficients so as to minimize the training set MSE. For these methods, the training set MSE can be quite small, but the test MSE is often much larger.
 
 ``` r
-# using the Wage dataset, visualize 3 estimates of f ----
+# using the income1 dataset, visualize 3 estimates of f ----
 # note: in this case, assume true f is a generalized additive model
-f.estimates <-
-  Wage %>%
-  ggplot(aes(x = age, y = wage)) +
+f.estimates <- build_single_models(x = "Education", y = "Income", df = income1)
+  
+f.estimates.plot <-
+  income1 %>%
+  ggplot(aes(x = Education, y = Income)) +
   geom_point(color = "gray") +
-  geom_smooth(se = FALSE
-              , color = "black"
-              , method = "gam"
-              , formula = y ~ s(x, bs = "cs")) +
-  geom_smooth(se = FALSE
-              , color = "#7eb837"
-              , method = "lm") +
-  geom_smooth(se = FALSE
-              , color = "#377eb8"
-              , method = "lm"
-              , formula = y ~ splines::bs(x, 6)) +
-  geom_smooth(se = FALSE
-              , color = "#b87137"
-              , method = "lm"
-              , formula = y ~ splines::bs(x, 22)) +
-  xlab("Age") +
-  ylab("Hourly wage") +
-  scale_y_continuous(labels = dollar) +
-  labs(title = "Three estimates of f, shown in black"
-       , subtitle = "Linear regression is in green and two smoothing spline fits (blue and brown)"
-       , caption = wage.text) +
+  geom_line(data = f.estimates$gam
+            , aes(x = Education, y = .fitted)
+            , color = "black"
+            , size = 1.25) +
+  geom_line(data = f.estimates$linear
+            , aes(x = Education, y = .fitted)
+            , color = "#7eb837"
+            , size = 1.25) +
+  geom_line(data = f.estimates$ss_df6
+            , aes(x = Education, y = .fitted)
+            , color = "#377eb8"
+            , size = 1.25) +
+  geom_line(data = f.estimates$ss_df22
+            , aes(x = Education, y = .fitted)
+            , color = "#b87137"
+            , size = 1.25) +
+  scale_x_continuous("Years of education"
+                     , breaks = pretty_breaks()) +
+  scale_y_continuous(name = "Annual income", labels = dollar) +
+  labs(title = "Three estimates of annual income explained by years of education (assume true f is in black)"
+       , subtitle = "Linear regression (green) and two smoothing spline fits (blue and brown)"
+       , caption = islr.text) +
   my.theme +
   theme(plot.title = element_text(size = 8)
         , plot.subtitle = element_text(size = 6))
   
-# create sample data for mse for the 3 f_estimates from above ----
-mse.df <-
-    tibble(flexibility = c(2, 2, 6, 6, 22, 22)
-           , mse = c(2.1, 1.75, 1.1, 0.9, 1.55, 0.39)
-           , type = rep(c("test", "training"), 3)
-           , f_estimate = c(rep("linear", 2)
-                            , rep("smoothing spline (df = 6)", 2)
-                            , rep("smoothing spline (df = 22)", 2))) %>%
-    mutate(f_estimate = factor(f_estimate
-                               , levels = c("linear"
-                                            , "smoothing spline (df = 6)"
-                                            , "smoothing spline (df = 22)")))
-  
-# visualize training, test and minimum possible test MSE over all methods ----
-mse.plot <-
-  mse.df %>%
-  ggplot(aes(x = flexibility, y = mse, label = f_estimate)) +
-  geom_smooth(aes(color = type)
-              , method = "loess"
-              , se = FALSE) +
-  geom_point(aes(color = f_estimate)
-             , shape = 15
-             , size = 4) +
-  scale_color_manual(values = c("#7eb837"
-                                , "#b87137"
-                                , "#377eb8"
-                                , "#b83737"
-                                , "gray")) +
-  geom_hline(yintercept = 1
-             , color = "black"
-             , linetype = "dashed") +
-  guides(color = FALSE) +
-  xlab("Flexibility (measured in degrees of freedom)") +
-  ylab("Mean Squared Error") +
-  labs(title = "The green, blue and brown squares indicate the MSEs\nthe corresponding models in the left-hand panel"
-       , subtitle = "Training (gray curve), test (red curve), and\nminimum possible test MSE over all methods (dashed line)"
-       , caption = chapter.text) +
-  my.theme +
-  theme(plot.title = element_text(size = 8)
-        , plot.subtitle = element_text(size = 6))
-  
-# display both plots side by side ----
-grid.arrange(f.estimates, mse.plot, ncol = 2)
+# display plot
+f.estimates.plot
 ```
 
 ![](README_files/figure-markdown_github/mse-1.png)
 
+This relationship between the test and training MSE is shown in the figures up above. The plot on the left-hand side illustrates three possible estimates for *f* obtained using methods with increasing levels of flexibility.
+
+The green line is the linear regression fit, which is relatively inflexible. The blue and brown curves were produced using smoothing splines, discussed in Chapter 7, with different levels of smoothness.
+
+**It is clear that as the level of flexibility increases, the curves fit the observed data more closely**. The brown curve is the most flexible and matches the data very well; however, we observe that it fits the true *f* (shown in black) poorly because it is too wiggly.
+
+The degrees of freedom is a quantity that summarizes the flexibility of a curve; it is discussed more fully in Chapter 7.
+
+When a given method yields a small training MSE but a large test MSE, we are said to be *overfitting* the data. Overfitting refers specifically to the case in which a less flexible model would have yielded a smaller test MSE.
+
 Notice the *U-shape* in the test MSE. This is a fundamental property of statistical learning that holds regardless of the particular data set at hand and regardless of the statistical method being used: **as model flexibility increases, training MSE will decrease, but the test MSE may not**.
+
+This happens because our statistical learning procedure is working too hard to find patterns in the training data, and may be picking up some patterns that are just caused by random chance rather than by true properties of the unknown function *f*.
+
+When we overfit the training data, the test MSE will be very large because the supposed patterns that the method found in the training data simply don’t exist in the test data. Note that regardless of whether or not overfitting has occurred, **we almost always expect the training MSE to be smaller than the test MSE because most statistical learning methods either directly or indirectly seek to minimize the training MSE**.
+
+### The Bias-Variance Trade-Off
+
+The U-shape observed in the test MSE curves turns out to be the result of two competing properties of statistical learning methods.
+
+Though the mathematical proof is beyond the scope of this book, it is possible to show that the expected test MSE, for a given value *x*<sub>0</sub>, can always be decomposed into the sum of three fundamental quantities: the *variance* of $\\hat{f}(x\_0)$, the squared *bias* of *f*(*x*<sub>0</sub>) and the variance of the error terms ε.
+
+$E(y\_0 - \\hat{f}(x\_0)) = Var(\\hat{f}(x\_0)) + \[Bias(\\hat{f}(x\_0))^2\] + Var(\\epsilon)$
+
+The equation tells us that **in order to minimize the expected test error, we need to select a statistical learning method that simultaneously achieves low variance and low bias**.
+
+Note that variance is inherently a nonnegative quantity, and squared bias is also nonnegative. Hence, we see that the expected test MSE can never lie below Var(ε), the irreducible error.
+
+What do we mean by the **variance** and **bias** of a statistical learning method?
+
+Variance refers to the amount by which $\\hat{f}$ would change if we estimated it using a different training data set. In general, more flexible statistical methods have higher variance.
+
+Since the training data are used to fit the statistical learning method, different training data sets will result in a different $\\hat{f}$.
+
+But ideally the estimate for *f* should not vary too much between training sets. However, if a method has high variance then small changes in the training data can result in large changes in $\\hat{f}$.
+
+On the other hand, bias refers to the error that is introduced by approximating a real-life problem, which may be extremely complicated, by a much simpler model.
 
 Session Info
 ------------
@@ -473,15 +481,15 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-02-03                  
+    ##  date     2019-02-09                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package     * version date       lib source        
     ##  assertthat    0.2.0   2017-04-11 [1] CRAN (R 3.5.0)
     ##  backports     1.1.3   2018-12-14 [1] CRAN (R 3.5.0)
     ##  bindr         0.1.1   2018-03-13 [1] CRAN (R 3.5.0)
-    ##  bindrcpp    * 0.2.2   2018-03-29 [1] CRAN (R 3.5.0)
-    ##  broom         0.5.1   2018-12-05 [1] CRAN (R 3.5.0)
+    ##  bindrcpp      0.2.2   2018-03-29 [1] CRAN (R 3.5.0)
+    ##  broom       * 0.5.1   2018-12-05 [1] CRAN (R 3.5.0)
     ##  cellranger    1.1.0   2016-07-27 [1] CRAN (R 3.5.0)
     ##  cli           1.0.1   2018-09-25 [1] CRAN (R 3.5.0)
     ##  colorspace    1.3-2   2016-12-14 [1] CRAN (R 3.5.0)
@@ -509,10 +517,10 @@ sessioninfo::session_info()
     ##  lubridate     1.7.4   2018-04-11 [1] CRAN (R 3.5.0)
     ##  magrittr      1.5     2014-11-22 [1] CRAN (R 3.5.0)
     ##  Matrix        1.2-15  2018-11-01 [1] CRAN (R 3.5.2)
-    ##  mgcv          1.8-26  2018-11-21 [1] CRAN (R 3.5.2)
+    ##  mgcv        * 1.8-26  2018-11-21 [1] CRAN (R 3.5.2)
     ##  modelr        0.1.2   2018-05-11 [1] CRAN (R 3.5.0)
     ##  munsell       0.5.0   2018-06-12 [1] CRAN (R 3.5.0)
-    ##  nlme          3.1-137 2018-04-07 [1] CRAN (R 3.5.2)
+    ##  nlme        * 3.1-137 2018-04-07 [1] CRAN (R 3.5.2)
     ##  pillar        1.3.1   2018-12-15 [1] CRAN (R 3.5.0)
     ##  pkgconfig     2.0.2   2018-08-16 [1] CRAN (R 3.5.0)
     ##  plyr          1.8.4   2016-06-08 [1] CRAN (R 3.5.0)

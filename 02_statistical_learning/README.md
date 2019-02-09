@@ -12,6 +12,7 @@ February 09, 2019
 -   [Assessing Model Accuracy](#assessing-model-accuracy)
     -   [Measuring the Quality of Fit](#measuring-the-quality-of-fit)
     -   [The Bias-Variance Trade-Off](#the-bias-variance-trade-off)
+    -   [The Classification Setting](#the-classification-setting)
 -   [Session Info](#session-info)
 
 ``` r
@@ -442,6 +443,8 @@ This happens because our statistical learning procedure is working too hard to f
 
 When we overfit the training data, the test MSE will be very large because the supposed patterns that the method found in the training data simply don’t exist in the test data. Note that regardless of whether or not overfitting has occurred, **we almost always expect the training MSE to be smaller than the test MSE because most statistical learning methods either directly or indirectly seek to minimize the training MSE**.
 
+Throughout this book, we discuss a variety of approaches that can be used in practice to estimate this minimum point. One important method is *cross-validation* (Chapter 5), which is a method for estimating test MSE using the training data.
+
 ### The Bias-Variance Trade-Off
 
 The U-shape observed in the test MSE curves turns out to be the result of two competing properties of statistical learning methods.
@@ -462,7 +465,100 @@ Since the training data are used to fit the statistical learning method, differe
 
 But ideally the estimate for *f* should not vary too much between training sets. However, if a method has high variance then small changes in the training data can result in large changes in $\\hat{f}$.
 
+The flexible brown curve above is following the observations very closely. **It has high variance because changing any one of these data points may cause the estimate $\\hat{f}$ to change considerably**. In contrast, the green least squares line is relatively inflexible and has low variance, because moving any single observation will likely cause only a small shift in the position of the line.
+
 On the other hand, bias refers to the error that is introduced by approximating a real-life problem, which may be extremely complicated, by a much simpler model.
+
+For example, linear regression assumes that there is a linear relationship between *Y* and *X*<sub>1</sub>, *X*<sub>2</sub>, . . . , *X*<sub>*p*</sub>. It is unlikely that any real-life problem truly has such a simple linear relationship, and so performing linear regression will undoubtedly result in some bias in the estimate of *f*.
+
+Generally, **more flexible methods result in less bias**.
+
+This leads to conclusion that as we use more flexible methods, the variance will increase and the bias will decrease; the use of inflexible methods will result in lower variance and higher bias.
+
+The relative rate of change of these two quantities determines whether the test MSE increases or decreases. As we increase the flexibility of a class of methods, the bias tends to initially decrease faster than the variance increases. Consequently, the expected test MSE declines.
+
+However, at some point increasing flexibility has little impact on the bias but starts to significantly increase the variance. When this happens the test MSE increases.
+
+Good test set performance of a statistical learning method re- quires **low variance as well as low squared bias**. This is referred to as a trade-off because it is easy to obtain a method with extremely low bias but high variance (for instance, by drawing a curve that passes through every single training observation) or a method with very low variance but high bias (by fitting a horizontal line to the data).
+
+The challenge lies in finding a method for which both the variance and the squared bias are low. *This trade-off is one of the most important recurring themes in this book*.
+
+In a real-life situation in which f is unobserved, it is generally not posssible to explicitly compute the test MSE, bias, or variance for a statistical learning method. Nevertheless, one should always keep the bias-variance trade-off in mind.
+
+In Chapter 5 we discuss cross-validation, which is a way to estimate the test MSE using the training data.
+
+### The Classification Setting
+
+Thus far, our discussion of model accuracy has been focused on the regres- sion setting. But many of the concepts that we have encountered, such as the bias-variance trade-off, transfer over to the classification setting with only some modifications due to the fact that *y*<sub>*i*</sub> is no longer numerical.
+
+Suppose that we seek to estimate *f* on the basis of training observations {(*x*<sub>1</sub>,*y*<sub>1</sub>),...,(*x*<sub>*n*</sub>,*y*<sub>*n*</sub>)}, where now *y*<sub>1</sub>,...,*y*<sub>*n*</sub> are qualitative. The most common approach for quantifying the accuracy of our estimate $\\hat{f}$ is the training *error rate*: the proportion of mistakes that are made if we apply our estimate $\\hat{f}$ to the training observations:
+
+$$\\frac{1}{n}\\sum\_{i=1}^{n} I(y\_i \\neq \\hat{y})$$
+
+Here $\\hat{y}\_i$ is the predicted class label for the *i*<sub>*t**h*</sub> observation using $\\hat{f}$.
+
+$I(y\_i \\neq \\hat{y})$ is an indicator variable that equals 1 if $y\_i \\neq \\hat{y}$ and zero if $y\_i = \\hat{y}$. If $I(y\_i \\neq \\hat{y}) = 0$ then the *i*<sub>*t**h*</sub> observation was classified correctly by our classification method; otherwise it was misclassified.
+
+Hence this equation computes the fraction of incorrect classifications. It is referred to as the training error rate because it is computed based on the data that was used to train our classifier.
+
+As in the regression setting, we are most interested in the error rates that result from applying our classifier to test observations that were not used in training. The *test error rate* associated with a set of test observations of the form (*x*<sub>0</sub>, *y*<sub>0</sub>) is given by:
+
+$Ave(I(y\_i \\neq \\hat{y}))$,
+
+where $\\hat{y}\_0$ is the predicted class label that results from applying the classifier to the test observation with predictor *x*<sub>0</sub>. A good classifier is one for which the test error is smallest.
+
+#### The Bayes Classifier
+
+It is possible to show (though the proof is outside of the scope of this book) that the test error rate is minimized, on average, by a very simple classifier that *assigns each observation to the most likely class, given its predictor values*.
+
+In other words, we should simply assign a test observation with predictor vector *x*<sub>0</sub> to the class *j* for which:
+
+*P**r*(*Y* = *j*|*X* = *x*<sub>0</sub>)
+
+is largest. Note that this equation is a *conditional probability*: it is the probability that *Y* = *j*, given the observed predictor vector *x*<sub>0</sub>. This very simple classifier is called the **Bayes classifier**.
+
+In a two-class problem where there are only two possible response values, say *class 1* or *class 2*, the Bayes classifier corresponds to predicting class 1 if *P**r*(*Y* = 1|*X* = *x*<sub>0</sub>) &gt; 0.5, and class 2 otherwise.
+
+The Bayes classifier’s prediction is determined by the *Bayes decision boundary*; an observation that falls on the orange side of the boundary will be assigned to the orange class, and similarly an observation on the blue side of the boundary will be assigned to the blue class.
+
+The orange shaded region reflects the set of points for which *P**r*(*Y* = *o**r**a**n**g**e*|*X*) is greater than 50%; whereas the blue shaded region reflects the set of points where the probability is less than 50%.
+
+The Bayes classifier produces the lowest possible test error rate, called the *Bayes error rate*. Since the Bayes classifier will always choose the class for which the probability is largest, the error rate at *X* = *x*<sub>0</sub> will be 1 − *m**a**x*<sub>*j*</sub>*P**r*(*Y* = *j*|*X* = *x*<sub>0</sub>).
+
+In general, the overall Bayes error rate is given by:
+
+1 − *E*(*m**a**x*<sub>*j*</sub>*P**r*(*Y* = *j*|*X* = *x*<sub>0</sub>)),
+
+where the expectation averages the probability over all possible values of *X*. The Bayes error rate is analogous to the irreducible error, discussed earlier.
+
+#### K Nearest Neighbors
+
+In theory we would always like to predict qualitative responses using the Bayes classifier. But for real data, we do not know the conditional distribution of *Y* given *X*, and so *computing the Bayes classifier is impossible*.
+
+Therefore, **the Bayes classifier serves as an unattainable gold standard against which to compare other methods**. Many approaches attempt to estimate the conditional distribution of *Y* given *X*, and then classify a given observation to the class with highest estimated probability.
+
+One such method is the *K-nearest neighbors (KNN)* classifier. Given a positive integer *K* and a test observation *x*<sub>0</sub>, the KNN classifier first identifies the *K* points in the training data that are closest to *x*<sub>0</sub>, represented by *N*<sub>0</sub>.
+
+It then estimates the conditional probability for class *j* as the fraction of points in *N*<sub>0</sub> whose response values equal *j*:
+
+$$Pr(Y = j | X = x\_0) = \\frac{1}{K} \\sum\_{i = 0}I(y\_i = j)$$
+.
+
+Finally, KNN applies Bayes rule and classifies the test observation *x*<sub>0</sub> to the class with the largest probability. The choice of *K* has a drastic effect on the KNN classifier obtained.
+
+Imagine two *K* values on sample data. When *K* = 1, the decision boundary is overly flexible and finds patterns in the data that don’t correspond to the Bayes decision boundary. This corresponds to a classifier that has low bias but very high variance.
+
+As *K* grows, the method becomes less flexible and produces a decision boundary that is close to linear. This corresponds to a low-variance but high-bias classifier.
+
+Just as in the regression setting, **there is not a strong relationship between the training error rate and the test error rate**. With *K* = 1, the KNN training error rate is 0, but the test error rate may be quite high.
+
+In general, as we use more flexible classification methods, the training error rate will decline but the test error rate may not.
+
+As in the regression setting, **the training error rate consistently declines as the flexibility increases**. However, the test error exhibits a characteristic U-shape, declining at first before increasing again when the method becomes excessively flexible and overfits.
+
+**In both the regression and classification settings, choosing the correct level of flexibility is critical to the success of any statistical learning method**. The bias-variance tradeoff, and the resulting U-shape in the test error, can make this a difficult task.
+
+In Chapter 5, we return to this topic and discuss various methods for estimating test error rates and thereby choosing the optimal level of flexibility for a given statistical learning method.
 
 Session Info
 ------------

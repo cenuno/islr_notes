@@ -1,7 +1,7 @@
 Statistical Learning
 ================
 Cristian E. Nuno
-February 09, 2019
+February 10, 2019
 
 -   [What is Statistical Learning?](#what-is-statistical-learning)
     -   [Why estimate f?](#why-estimate-f)
@@ -85,7 +85,7 @@ df.tidy %>%
   scale_y_continuous(name = "Sales (in thousands of units)"
                      , limits = c(0, 30)) +
   facet_wrap(facets = vars(type)) +
-  labs(title = "Increasing the radio advertisement budget\nincreases sales at a higher rate than both TV or newspapers"
+  labs(title = "Increasing the radio advertisement budget increases sales at a\nhigher rate than increasing the budgets for either TV or newspapers"
        , caption = islr.text) +
   my.theme
 ```
@@ -576,7 +576,7 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-02-09                  
+    ##  date     2019-02-10                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package     * version date       lib source        

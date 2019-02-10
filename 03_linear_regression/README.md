@@ -1,9 +1,10 @@
 Linear Regression
 ================
 Cristian E. Nuno
-February 09, 2019
+February 10, 2019
 
 -   [Simple Linear Regression](#simple-linear-regression)
+    -   [Estimating the Coefficients](#estimating-the-coefficients)
 -   [Session Info](#session-info)
 
 ``` r
@@ -33,6 +34,9 @@ wage.text <- "Source: Wage and other data for a group of 3000 male workers in th
 
 chapter.text <-
   "Source: ISLR, Chapter 3 | made by @cenuno_"
+
+bright.blue   <- "#1e5efb"
+bright.yellow <- "#edd830"
 
 # set dpi for all chunks ----
 knitr::opts_chunk$set(dpi = 300)
@@ -100,6 +104,52 @@ $\\hat{y} = \\hat{β}\_0 + \\hat{β}\_1x$,
 
 where $\\hat{y}$ indicates a prediction of *Y* on the basis of *X* = *x*. Here we use a hat symbol, *ˆ* , to denote the estimated value for an unknown parameter or coefficient, or to denote the predicted value of the response.
 
+### Estimating the Coefficients
+
+In practice, *β*<sub>0</sub> and *β*<sub>1</sub> are unknown. So before we can use *Y* ≈ *β*<sub>0</sub> + *β*<sub>1</sub>*X* to make predictions, we must use data to estimate the coefficients. Let
+
+(*x*<sub>1</sub>, *y*<sub>1</sub>), (*x*<sub>2</sub>, *y*<sub>2</sub>),..., (*x*<sub>*n*</sub>, *y*<sub>*n*</sub>)
+
+represent *n* observation pairs, each of which consists of a measurement of *X* and a measurement of *Y*. In the `Advertising` example, this data set consists of the `TV` advertising budget and product `sales` in *n* = 200 different markets.
+
+Our goal is to obtain coefficient estimates $\\hat{β}\_0$ and $\\hat{β}\_1$ such that the linear model fits the available data well: that is, so that $y\_i ≈ \\hat{\\beta}\_0 + \\hat{β}\_1 \* x\_i$ for *i* = 1, ..., *n*.
+
+In other words, we want to find an intercept $\\hat{β}\_0$ and a slope $\\hat{β}\_1$ such that the resulting line is as close as possible to the *n* = 200 data points. There are a number of ways of *measuring closeness*. **However, by far the most common approach involves minimizing the least squares criterion**, and we take that approach in this chapter.
+
+``` r
+# load necessary data ----
+df <- 
+  read_csv(here("00_raw_data", "advertising.csv")) %>%
+  # drop row number column
+  select(-X1)
+
+# regress TV onto sales ----
+mod <- 
+  lm(sales ~ TV, data = df) %>%
+  augment()
+
+# visualize -----
+df %>%
+  ggplot(aes(x = TV, y = sales)) +
+  geom_point(color = bright.blue) +
+  geom_line(data = mod
+            , aes(x = TV, y = .fitted)
+            , color = bright.yellow
+            , size = 1.25) +
+  geom_segment(data = mod
+               , aes(xend = TV, yend = .fitted)
+               , color = "gray65") +
+  scale_x_continuous(name = "TV budget (in thousands of dollars)", labels = dollar) +
+  scale_y_continuous(name = "Sales (in thousands of units)"
+                     , limits = c(0, 30)) +
+  labs(title = "Least squares fit for the regression of sales onto TV is shown"
+       , subtitle = "Each blue point represents the data that exist between TV and sales;\nThe yellow line is the slope that minimizes the sum of the squared errors;\nEach gray line represents an error from the actual sales value and the predicted one"
+       , caption = islr.text) +
+  my.theme
+```
+
+![](README_files/figure-markdown_github/first%20model-1.png)
+
 Session Info
 ------------
 
@@ -117,7 +167,7 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-02-09                  
+    ##  date     2019-02-10                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package     * version date       lib source        
@@ -147,6 +197,7 @@ sessioninfo::session_info()
     ##  ISLR        * 1.2     2017-10-20 [1] CRAN (R 3.5.0)
     ##  jsonlite      1.6     2018-12-07 [1] CRAN (R 3.5.0)
     ##  knitr         1.21    2018-12-10 [1] CRAN (R 3.5.2)
+    ##  labeling      0.3     2014-08-23 [1] CRAN (R 3.5.0)
     ##  lattice       0.20-38 2018-11-04 [1] CRAN (R 3.5.2)
     ##  lazyeval      0.2.1   2017-10-29 [1] CRAN (R 3.5.0)
     ##  lubridate     1.7.4   2018-04-11 [1] CRAN (R 3.5.0)

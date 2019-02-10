@@ -81,9 +81,8 @@ df.tidy %>%
   geom_smooth(se = FALSE
               , method = "lm"
               , color = "black") +
-  scale_x_continuous(name = "Budget", labels = dollar) +
-  scale_y_continuous(name = "Sales"
-                     , labels = dollar
+  scale_x_continuous(name = "Budget (in thousands of dollars)", labels = dollar) +
+  scale_y_continuous(name = "Sales (in thousands of units)"
                      , limits = c(0, 30)) +
   facet_wrap(facets = vars(type)) +
   labs(title = "Increasing the radio advertisement budget\nincreases sales at a higher rate than both TV or newspapers"

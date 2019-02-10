@@ -5,6 +5,7 @@ February 10, 2019
 
 -   [Simple Linear Regression](#simple-linear-regression)
     -   [Estimating the Coefficients](#estimating-the-coefficients)
+    -   [Assessing the Accuracy of the Coefficient Estimates](#assessing-the-accuracy-of-the-coefficient-estimates)
 -   [Session Info](#session-info)
 
 ``` r
@@ -175,7 +176,73 @@ $$\\bar{y} \\equiv \\frac{1}{n}\\sum^n\_{i = 1}y\_i$$
 $$\\bar{x} \\equiv \\frac{1}{n}\\sum^n\_{i = 1}x\_i$$
  are the sample means. In other words, the equations for $\\hat{\\beta}\_0$ and $\\hat{\\beta}\_1$ define the least squares coefficient estimates for simple linear regression.
 
-The linear model up above displays the simple linear regression fit to the `Advertising` data, where \_0 = 7.03 and \_1 = 0.04754.
+The linear model up above displays the simple linear regression fit to the `Advertising` data, where \_0 = 7.03 and \_1 = 0.04754. In other words, according to this approximation, an additional $1,000 spent on TV advertising is associated with with selling an approximately 47.5 additional units of the product.
+
+### Assessing the Accuracy of the Coefficient Estimates
+
+Recall from Chapter 2 that we assume that the true relationship between *X* and *Y* takes the form *Y* = *f*(*X*) + *ϵ* for some unknown function *f*, where *ϵ* is a mean-zero random error term. If *f* is to be approximated by a linear function, then we can write this relationship as:
+
+*Y* = *β*<sub>0</sub> + *β*<sub>1</sub>*X* + *ϵ*
+.
+
+Here *β*<sub>0</sub> is the intercept term—that is, the expected value of *Y* when *X* = 0, and *β*<sub>1</sub> is the slope—the average increase in *Y* associated with a one-unit increase in *X*.
+
+The error term is a catch-all for what we miss with this simple model: the true relationship is probably not linear, there may be other variables that cause variation in *Y*, and there may be measurement error. We typically assume that the error term is independent of *X*.
+
+*Y* = *β*<sub>0</sub> + *β*<sub>1</sub>*X* + *ϵ*
+ defines the population regression line, which is the best linear approximation to the true relationship between *X* and *Y*. The assumption of linearity is often a useful working model. However, despite what many textbooks might tell us, we seldom believe that the true relationship is linear.
+
+The least squares regression coefficient estimates for \_0 and \_1 characterize the least squares line.
+
+At first glance, the difference between the population regression line and the least squares line may seem subtle and confusing. We only have one data set, and so what does it mean that two different lines describe the relationship between the predictor and the response?
+
+Fundamentally, the **concept of these two lines is a natural extension of the standard statistical approach of using information from a sample to estimate characteristics of a large population**. For example, suppose that we are interested in knowing the population mean *μ* of some random variable *Y*.
+
+Unfortunately, *μ* is unknown, but we do have access to *n* observations from *Y*, which we can write as *y*<sub>1</sub>, ..., *y*<sub>*n*</sub>, and which we can use to estimate *μ*. A reasonable estimate is $\\hat{\\mu}$ = $\\bar{y}$, where $\\bar{y}$ = $\\frac{1}{n}\\sum^n\_{i = 1}y\_i$ is the sample mean.
+
+**The sample mean and the population mean are different, but in general the sample mean will provide a good estimate of the population mean**.
+
+In the same way, the unknown coefficients *β*<sub>0</sub> and *β*<sub>1</sub> in linear regression define the population regression line. We seek to estimate these unknown coefficients using $\\hat{β}\_0$ and $\\hat{β}\_1$. These coefficient estimates define the least squares line.
+
+The analogy between linear regression and estimation of the mean of a random variable is an apt one based on the concept of *bias*. If we use the sample mean $\\hat{\\mu|$ to estimate *μ*, this estimate is unbiased, in the sense that on average, we expect $\\hat{\\mu}$ to equal *μ*.
+
+What exactly does this mean?
+
+It means that on the basis of one particular set of observations *y*<sub>1</sub>, . . . , *y*<sub>*n*</sub>, $\\hat{\\mu}$ might overestimate *μ*, and on the basis of another set of observations, $\\hat{\\mu}$ might underestimate *μ*. But if we could average a huge number of estimates of *μ* obtained from a huge number of sets of observations, then this average would *exactly* equal *μ*.
+
+Hence, an unbiased estimator does not *systematically* over or under-estimate the true parameter. The property of unbiasedness holds for the least squares coefficient estimates as well: if we estimate *β*<sub>0</sub> and *β*<sub>1</sub> on the basis of a particular data set, then our estimates won’t be exactly equal to *β*<sub>0</sub> and *β*<sub>1</sub>. But if we could average the estimates obtained over a huge number of data sets, then the average of these estimates would be spot on!
+
+We continue the analogy with the estimation of the population mean *μ* of a random variable *Y*. A natural question is as follows: how accurate is the sample mean $\\hat{\\mu}$ as an estimate of *μ*?
+
+We have established that the average of $\\hat{\\mu}$’s over many data sets will be very close to *μ*, but that a single estimate $\\hat{\\mu}$ may be a substantial underestimate or overestimate of *μ*. How far off will that single estimate of $\\hat{\\mu}$ be?
+
+In general, we answer this question by computing the *standard error* of $\\hat{\\mu}$, written as $SE(\\hat{\\mu})$. We have the well-known formula:
+
+$$Var(\\hat{\\mu}) = SE(\\hat{\\mu})^2 = \\frac{\\sigma^2}{n}$$
+,
+
+where *σ* is the standard deviation of each of the realizations *y*<sub>*i*</sub> of *Y* (this formula holds provided that the *n* observations are uncorrelated). Roughly speaking, the standard error tells us the average amount that this estimate $\\hat{\\mu}$ differs from the actual value of *μ*.
+
+The equation for *S**E* also tells us how this deviation shrinks with *n*—**the more observations we have, the smaller the standard error of $\\hat{\\mu}$**. In a similar vein, we can wonder how close $\\hat{β}\_0$ and $\\hat{β}\_1$ are to the true values *β*<sub>0</sub> and *β*<sub>1</sub>.
+
+To compute the standard errors associated with $\\hat{β}\_0$ and $\\hat{β}\_1$, we use the following formulas:
+
+$$SE(\\hat{\\beta\_0})^2 = \\sigma^2\\bigg\[\\frac{1}{n} + \\frac{\\bar{x}^2}{\\sum^n\_{i = 1}(x\_i - \\bar{x})^2}\\bigg\]$$
+, and
+
+$$SE(\\hat{\\beta\_1})^2 = \\frac{\\sigma^2}{\\sum^n\_{i = 1}(x\_i - \\bar{x})^2}$$
+,
+
+where *σ*<sup>2</sup> = *V**a**r*(*ϵ*). For these formulas to be strictly valid, we need to assume that the errors *ϵ*<sub>*i*</sub> for each observation are uncorrelated with common variance *σ*<sup>2</sup>. This is clearly not true when regressing `TV` onto `sales`, but the formula still turns out to be a good approximation.
+
+Notice in the formula that $SE(\\hat{β}\_1)$ is smaller when the *x*<sub>*i*</sub> are more spread out; intuitively we have more *leverage* to estimate a slope when this is the case. We also see that $SE(\\hat{\\beta}\_0)$ would be the same as $SE(\\hat{\\mu})$ if $\\bar{x}$ were zero (in which case $\\hat{β}\_0$ would be equal to $\\bar{y}$).
+
+In general, *σ*<sup>2</sup> is not known, but can be estimated from the data. The estimate of *σ* is known as the *residual standard error*, and is given by the formula:
+
+$$RSE = \\sqrt{\\frac{RSS}{n - 2}}$$
+.
+
+Strictly speaking, when *σ* is estimated from the data we should write $\\hat{SE}(\\hat{β}\_1)$ to indicate that an estimate has been made, but for simplicity of notation we will drop this extra "hat".
 
 Session Info
 ------------

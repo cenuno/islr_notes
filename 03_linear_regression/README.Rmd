@@ -132,28 +132,52 @@ df <-
 
 # regress TV onto sales ----
 mod <- 
-  lm(sales ~ TV, data = df) %>%
-  augment()
+  lm(sales ~ TV, data = df)
+
+# transform lm object into tibble ----
+mod.tidy <- augment(mod)
 
 # visualize -----
 df %>%
   ggplot(aes(x = TV, y = sales)) +
   geom_point(color = bright.blue) +
-  geom_line(data = mod
+  geom_line(data = mod.tidy
             , aes(x = TV, y = .fitted)
             , color = bright.yellow
             , size = 1.25) +
-  geom_segment(data = mod
+  geom_segment(data = mod.tidy
                , aes(xend = TV, yend = .fitted)
                , color = "gray65") +
   scale_x_continuous(name = "TV budget (in thousands of dollars)", labels = dollar) +
   scale_y_continuous(name = "Sales (in thousands of units)"
                      , limits = c(0, 30)) +
-  labs(title = "Least squares fit for the regression of sales onto TV is shown"
-       , subtitle = "Each blue point represents the data that exist between TV and sales;\nThe yellow line is the slope that minimizes the sum of the squared errors;\nEach gray line represents an error from the actual sales value and the predicted one"
+  labs(title = "Linear fit captures the essence of the relationship between sales and TV budget\nalthough it is somewhat deficient on the left-hand side of the plot"
+       , subtitle = "Each blue point represents the data that exist between TV and sales;\nThe yellow line is the slope that minimizes the sum of the squared errors;\nEach gray line represents an error from the observed sales value and the predicted value"
        , caption = islr.text) +
   my.theme
 ```
+
+Let $\hat{y}_i$ = $\hat{β}_0$ + $\hat{β}_1x_i$ be the prediction for $Y$ based on the $i_{th}$ value of $X$. Then $e_i$ = $y_i$ − $\hat{y}_i$ represents the $i_{th}$ residual—this is the difference between the $i_{th}$ observed response value and the $i_{th}$ response value that is predicted by our linear model.
+
+We define the **residual sum of squares (RSS)** as:
+
+$RSS = e_1^2 + e_2^2 + · · · + e_n^2$,
+
+or equivalently as:
+
+$RSS = (y_1 − \hat{β}_0 − \hat{β}_1x_1)^2 + (y_2 − \hat{β}_0 − \hat{β}_1x_2)^2 + ... + (y_n − \hat{β}_0 − \hat{β}_1x_n)^2$
+
+
+The least squares approach chooses \hat{β}_0 and \hat{β}_1 to minimize the RSS. Using some calculus, one can show that the minimizers are:
+
+$$\hat{\beta}_1 = \frac{\sum^n_{i = 1}(x_i - \bar{x})(y_i - \bar{y})}{\sum^n_{i = 1}(x_i - \bar{x})^2}$$
+
+$$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}$$,
+
+where $$\bar{y} \equiv \frac{1}{n}\sum^n_{i = 1}y_i$$ and $$\bar{x} \equiv \frac{1}{n}\sum^n_{i = 1}x_i$$ are the sample means. In other words, the equations for $\hat{\beta}_0$ and $\hat{\beta}_1$ define the least squares coefficient estimates for simple linear regression.
+
+The linear model up above displays the simple linear regression fit to the `Advertising` data, where \hat{β}_0 = `r round(mod$coefficients[["(Intercept)"]], digits = 2)` and \hat{β}_1 = `r format(mod$coefficients[["TV"]], digits = 4)`.
+
 
 ## Session Info
 

@@ -1,0 +1,115 @@
+---
+title: "Linear Regression"
+author: "Cristian E. Nuno"
+date: "`r format( x = Sys.Date(), format = '%B %d, %Y')`"
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+    dev: png
+---
+
+```{r setup, message = FALSE, warning = FALSE}
+# load necessary packages -----
+library(broom)
+library(gridExtra)
+library(here)
+library(ISLR)
+library(mgcv)
+library(scales)
+library(splines)
+library(tidyverse)
+
+# load necessary functions ----
+source(here("00_functions", "01_build_single_models.R"))
+
+# load necessary objects ----
+my.theme <- 
+  theme_minimal() + 
+  theme(panel.grid = element_blank()
+        , plot.caption = element_text(size = 5))
+
+islr.text <-
+  "Source: ISLR (http://www-bcf.usc.edu/~gareth/ISL/data.html) | made by @cenuno_"
+
+wage.text <- "Source: Wage and other data for a group of 3000 male workers in the Mid-Atlantic region | made by @cenuno_"
+
+chapter.text <-
+  "Source: ISLR, Chapter 3 | made by @cenuno_"
+
+# set dpi for all chunks ----
+knitr::opts_chunk$set(dpi = 300)
+```
+
+This chapter is about *linear regression*, a very simple approach for supervised learning. In particular, **linear regression is a useful tool for predicting a quantitative response**.
+
+Linear regression has been around for a long time and is the topic of innumerable textbooks. Though it may seem somewhat dull compared to some of the more modern statistical learning approaches described in later chapters of this book, linear regression is still a useful and widely used statistical learning method.
+
+Moreover, it serves as a good jumping-off point for newer approaches: as we will see in later chapters, many fancy statistical learning approaches can be seen as generalizations or extensions of linear regression. *Consequently, the importance of having a good understanding of linear regression before studying more complex learning methods cannot be overstated*.
+
+In this chapter, we review some of the key ideas underlying the linear regression model, as well as the least squares approach that is most commonly used to fit this model.
+
+Recall the `Advertising` data from Chapter 2.
+
+![](https://github.com/cenuno/islr_notes/raw/master/02_statistical_learning/README_files/figure-markdown_github/examine%20advertising-1.png)
+
+Suppose that in our role as statistical consultants we are asked to suggest, on the basis of this data, a marketing plan for next year that will result in high product sales. What information would be useful in order to provide such a recommendation? 
+
+Here are a few important questions that we might seek to address:
+
+1. Is there a relationship between advertising budget and sales?
+    + Our first goal should be to determine whether the data provide evidence of an association between advertising expenditure and sales. *If the evidence is weak, then one might argue that no money should be spent on advertising*!
+    
+2. How strong is the relationship between advertising budget and sales?
+    + Assuming that there is a relationship between advertising and sales, we would like to know the strength of this relationship. 
+    + **In other words, given a certain advertising budget, can we predict sales with a high level of accuracy?** This would be a strong relationship. 
+    + Or is a prediction of sales based on advertising expenditure only slightly better than a random guess? This would be a weak relationship.
+    
+3. Which media contribute to sales?
+    + Do all three media—TV, radio, and newspaper—contribute to sales, or do just one or two of the media contribute? 
+    + To answer this question, we must *find a way to separate out the individual effects of each medium when we have spent money on all three media*.
+    
+4. How accurately can we estimate the effect of each medium on sales? 
+    + For every dollar spent on advertising in a particular medium, by what amount will sales increase? 
+    + How accurately can we predict this amount of increase?
+    
+5. How accurately can we predict future sales?
+    + For any given level of television, radio, or newspaper advertising, what is our prediction for sales, and what is the accuracy of this prediction?
+    
+6. Is the relationship linear?
+    + If there is approximately a straight-line relationship between advertising expenditure in the various media and sales, then linear regression is an appropriate tool. 
+    + If not, then it may still be possible to transform the predictor or the response so that linear regression can be used.
+    
+7. Is there synergy among the advertising media?
+    + Perhaps spending $50,000 on television advertising and $50,000 on radio advertising results in more sales than allocating $100,000 to either television or radio individually. 
+    + In marketing, this is known as a synergy effect, while in statistics it is called an *interaction effect*.
+    
+It turns out linear regression can be used to answer each of these questions. We will first discuss all of these questions in a general context, and then return to them in this specific context in Section 3.4.
+
+## Simple Linear Regression
+
+Simple linear regression lives up to its name: it is a very straightforward approach for predicting a quantitative response $Y$ on the basis of a single predictor variable $X$. It assumes that there is approximately a linear relationship between $X$ and $Y$. 
+
+Mathematically, we can write this linear relationship as:
+
+$Y ≈ β_0 + β_1X$,
+
+where $≈$ is read as "approximately modeled as" and saying we are regressing $Y$ onto $X$.
+
+For example, $X$ may represent `TV` advertising and $Y$ may represent `sales`. Then we can regress `sales` onto `TV` by fitting the model:
+
+$sales ≈ β_0 +β_1*TV$.
+
+$β_0$ and $β_1$ are two unknown constants that represent the *intercept* and *slope* terms in the linear model. Together, $β_0$ and $β_1$ are known as the model coefficients or parameters.
+
+Once we have used our training data to produce estimates $\hat{β}_0$ and $\hat{β}_1$ for the model coefficients, we can predict future sales on the basis of a particular value of TV advertising by computing:
+
+$\hat{y} = \hat{β}_0 + \hat{β}_1x$,
+
+where $\hat{y}$ indicates a prediction of $Y$ on the basis of $X = x$. Here we use a hat symbol, $ˆ$ , to denote the estimated value for an unknown parameter or coefficient, or to denote the predicted value of the response.
+
+## Session Info
+
+```{r session info}
+sessioninfo::session_info()
+```

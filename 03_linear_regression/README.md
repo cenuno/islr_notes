@@ -1,7 +1,7 @@
 Linear Regression
 ================
 Cristian E. Nuno
-February 10, 2019
+February 11, 2019
 
 -   [Simple Linear Regression](#simple-linear-regression)
     -   [Estimating the Coefficients](#estimating-the-coefficients)
@@ -244,6 +244,67 @@ $$RSE = \\sqrt{\\frac{RSS}{n - 2}}$$
 
 Strictly speaking, when *σ* is estimated from the data we should write $\\hat{SE}(\\hat{β}\_1)$ to indicate that an estimate has been made, but for simplicity of notation we will drop this extra "hat".
 
+Standard errors can be used to compute *confidence intervals*. **A 95% confidence interval is defined as a range of values such that with 95% probability, the range will contain the true unknown value of the parameter**.
+
+The range is defined in terms of lower and upper limits computed from the sample of data. For linear regression, the 95% confidence interval for *β*<sub>1</sub> approximately takes the form:
+
+$$\\beta\_1 \\pm 2 \* SE(\\hat{\\beta}\_1)$$
+.
+
+That is, there is approximately a 95% chance that the interval
+
+$$\\bigg\[\\beta\_1 - 2 \* SE(\\hat{\\beta}\_1), \\beta\_1 + 2 \* SE(\\hat{\\beta}\_1)\\bigg\]$$
+
+will contain the true value of *β*<sub>1</sub> (relies on the assumption that the errors are Gaussian and 2 should be replaced with the 97.5% quantile of a t-distribution with *n* − 2 degrees of freedom).
+
+Similarly, a confidence interval for β0 approximately takes the form:
+
+$$\\beta\_0 \\pm 2 \* SE(\\hat{\\beta}\_0)$$
+.
+
+``` r
+# source the standard_error() function ----
+source(here("00_functions", "02_standard_error.R"))
+
+# source the confidence_interval() function ----
+source(here("00_functions", "03_confidence_interval.R"))
+
+# calculate SE for the both coeffiencents ----
+se <-
+  c(TRUE, FALSE) %>%
+  set_names(c("intercept", "input")) %>%
+  map(.f = ~ standard_error(model = mod
+                            , input = "TV"
+                            , intercept = .x))
+
+# calculate lower and upper bounds of the coefficients ----
+confidence.interval <-
+  se %>%
+  map2(.y = coefficients(mod)
+       , .f = ~ confidence_interval(coeff = .y
+                                    , std.error = .x
+                                    , level = 0.95
+                                    , df = mod$df.residual))
+
+# store estimates of both intercept and input ----
+response.unit <- 1000
+
+intercept.estimates <-
+  confidence.interval$intercept %>%
+  round(digits = 2) %>%
+  "*"(response.unit) %>%
+  prettyNum(big.mark = ",")
+
+input.estimates <-
+  confidence.interval$input %>%
+  round(digits = 3) %>%
+  "*"(response.unit)
+```
+
+In the case of the advertising data, the 95% confidence interval for *β*<sub>0</sub> is \[6.13, 7.935\] and the 95 % confidence interval for *β*<sub>1</sub> is \[0.042, 0.053\]. The interpretation of the confidence interval requires that we understand the units of the input and response variable.
+
+Therefore, we can conclude that in the absence of any advertising, sales will, on average, fall somewhere between 6,130 and 7,940 units. Furthermore, for each $1,000 increase in television advertising, there will be an average increase in sales of between 42 and 53 units.
+
 Session Info
 ------------
 
@@ -261,7 +322,7 @@ sessioninfo::session_info()
     ##  collate  en_US.UTF-8                 
     ##  ctype    en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2019-02-10                  
+    ##  date     2019-02-11                  
     ## 
     ## ─ Packages ──────────────────────────────────────────────────────────────
     ##  package     * version date       lib source        

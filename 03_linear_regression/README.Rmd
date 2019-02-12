@@ -286,13 +286,13 @@ response.unit <- 1000
 intercept.estimates <-
   confidence.interval$intercept %>%
   round(digits = 2) %>%
-  "*"(response.unit) %>%
+  magrittr::multiply_by(response.unit) %>%
   prettyNum(big.mark = ",")
 
 input.estimates <-
   confidence.interval$input %>%
   round(digits = 3) %>%
-  "*"(response.unit)
+  magrittr::multiply_by(response.unit)
 ```
 
 In the case of the advertising data, the 95% confidence interval for $\beta_0$ is [`r paste(round(confidence.interval$intercept, digits = 3), collapse = ", ")`] and the 95 % confidence interval for $\beta_1$ is [`r paste(round(confidence.interval$input, digits = 3), collapse = ", ")`]. The interpretation of the confidence interval requires that we understand the units of the input and response variable. 
